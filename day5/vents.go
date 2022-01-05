@@ -1,7 +1,6 @@
 package day5
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -9,24 +8,26 @@ import (
 )
 
 type vent struct {
-	x1, x2, y1, y2 int
+	x1, y1, x2, y2 int
 }
 
 type ventMap [][]int
 
-func (v ventMap) String() string {
+func (vm ventMap) String() string {
 	s := ""
-	for i := range v {
-		s += fmt.Sprintf("%v\n", v[i])
+	for i := range vm {
+		ss := fetch.IntToStringSlice(vm[i])
+		s += strings.Replace(strings.Join(ss, ""), "0", ".", -1)
+		s += "\n"
 	}
 	return s
 }
 
-func (v ventMap) countTwos(size int) int {
+func (vm ventMap) countTwos() int {
 	var n int
-	for y := 0; y < size; y++ {
-		for x := 0; x < size; x++ {
-			if v[y][x] >= 2 {
+	for y := 0; y < len(vm); y++ {
+		for x := 0; x < len(vm); x++ {
+			if vm[y][x] >= 2 {
 				n++
 			}
 		}
@@ -34,20 +35,89 @@ func (v ventMap) countTwos(size int) int {
 	return n
 }
 
-func MapVents(coords []string, diagonal bool) int {
-	vents := parseCoords(coords)
-	size := squareSize(vents)
+func makeVentMap(size int) ventMap {
 	var vm ventMap = make([][]int, size)
 	for i := range vm {
 		vm[i] = make([]int, size)
 	}
+	return vm
+}
+
+func MapVents(coords []string, diagonal bool) int {
+	vents := parseCoords(coords)
+	size := squareSize(vents)
+	vm := makeVentMap(size)
 
 	mapVentsStraight(vents, vm)
 	if diagonal {
 		mapVentsDiagonal(vents, vm)
 	}
-	fmt.Println(vm)
-	return vm.countTwos(size)
+	return vm.countTwos()
+}
+
+func mapVentsStraight(vents []vent, vm ventMap) {
+Loop:
+	for _, v := range vents {
+		var start, end, constant int
+		var yconst bool
+		switch x1, y1, x2, y2 := v.x1, v.y1, v.x2, v.y2; {
+		case x1 == x2 && y2 > y1:
+			start, end, constant = y1, y2, x1
+			yconst = false
+		case x1 == x2 && y1 > y2:
+			start, end, constant = y2, y1, x1
+			yconst = false
+		case y1 == y2 && x2 > x1:
+			start, end, constant = x1, x2, y1
+			yconst = true
+		case y1 == y2 && x1 > x2:
+			start, end, constant = x2, x1, y1
+			yconst = true
+		default:
+			continue Loop
+		}
+
+		for i := start; i <= end; i++ {
+			if yconst {
+				vm[constant][i]++
+			} else {
+				vm[i][constant]++
+			}
+		}
+	}
+}
+
+func mapVentsDiagonal(vents []vent, vm ventMap) {
+Loop:
+	for _, v := range vents {
+		var xS, xE, yS, yE int
+		switch x1, y1, x2, y2 := v.x1, v.y1, v.x2, v.y2; {
+		case x1 < x2 && y1 > y2:
+			xS, xE = x1, x2
+			yS, yE = y1, y2
+		case x1 < x2 && y1 < y2:
+			xS, xE = x1, x2
+			yS, yE = y1, y2
+		case x1 > x2 && y1 < y2:
+			xS, xE = x2, x1
+			yS, yE = y2, y1
+		case x1 > x2 && y1 > y2:
+			xS, xE = x2, x1
+			yS, yE = y2, y1
+		default:
+			continue Loop
+		}
+
+		y := yS
+		for x := xS; x <= xE; x++ {
+			vm[y][x]++
+			if yS < yE {
+				y++
+			} else {
+				y--
+			}
+		}
+	}
 }
 
 func parseCoords(coords []string) []vent {
@@ -86,64 +156,6 @@ func squareSize(vents []vent) int {
 	}
 }
 
-func mapVentsStraight(vents []vent, vm ventMap) {
-Loop:
-	for _, v := range vents {
-		var start, end, constant int
-		var yconst bool
-		switch x1, y1, x2, y2 := v.x1, v.y1, v.x2, v.y2; {
-		case x1 == x2 && y2 > y1:
-			start, end, constant = y1, y2, x1
-			yconst = false
-		case x1 == x2 && y1 > y2:
-			start, end, constant = y2, y1, x1
-			yconst = false
-		case y1 == y2 && x2 > x1:
-			start, end, constant = x1, x2, y1
-			yconst = true
-		case y1 == y2 && x1 > x2:
-			start, end, constant = x2, x1, y1
-			yconst = true
-		default:
-			continue Loop
-		}
-
-		for i := start; i <= end; i++ {
-			if yconst {
-				vm[constant][i]++
-			} else {
-				vm[i][constant]++
-			}
-		}
-	}
-}
-
-func mapVentsDiagonal(vents []vent, vm ventMap) {
-Loop:
-	for _, v := range vents {
-		var xS, xE, y int
-		switch x1, y1, x2, y2 := v.x1, v.y1, v.x2, v.y2; {
-		case x1 < x2 && y1 > y2:
-			xS, xE = x1, x2
-			y = y2
-		case x1 < x2 && y1 < y2:
-			xS, xE = x1, x2
-			y = y1
-		case x1 > x2 && y1 < y2:
-			xS, xE = x2, x1
-			y = y1
-		case x1 > x2 && y1 > y2:
-			xS, xE = x2, x1
-			y = y2
-		default:
-			continue Loop
-		}
-		for x := xS; x <= xE; x++ {
-			vm[y][x]++
-			y++
-		}
-	}
-}
 func split(r rune) bool {
 	return r == ',' || r == '-' || r == '>' || r == ' '
 }

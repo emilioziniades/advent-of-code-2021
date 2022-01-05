@@ -44,3 +44,12 @@ func StringToIntSlice(stringSlice []string) ([]int, error) {
 	}
 	return intSlice, nil
 }
+
+func IntToStringSlice(intSlice []int) []string {
+	strSlice := make([]string, len(intSlice))
+	for i := range intSlice {
+		s := strconv.Itoa(intSlice[i])
+		strSlice[i] = s
+	}
+	return strSlice
+}

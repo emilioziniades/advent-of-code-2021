@@ -17,7 +17,7 @@ func init() {
 }
 func TestMapVents(t *testing.T) {
 	testMapVents(t, "day5-example.txt", 5)
-	//	testMapVents(t, "day5-input.txt", 8622)
+	testMapVents(t, "day5-input.txt", 8622)
 }
 
 func testMapVents(t *testing.T, file string, want int) {
@@ -34,7 +34,7 @@ func testMapVents(t *testing.T, file string, want int) {
 
 func TestMapVentsDiag(t *testing.T) {
 	testMapVentsDiag(t, "day5-example.txt", 12)
-	testMapVentsDiag(t, "day5-input.txt", 0)
+	testMapVentsDiag(t, "day5-input.txt", 22037)
 }
 
 func testMapVentsDiag(t *testing.T, file string, want int) {
