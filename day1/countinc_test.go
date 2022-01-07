@@ -10,6 +10,7 @@ import (
 
 	"github.com/emilioziniades/adventofcode2021/day1"
 	"github.com/emilioziniades/adventofcode2021/fetch"
+	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 func init() {
@@ -29,7 +30,7 @@ func TestCountIncThree(t *testing.T) {
 }
 
 func testCountInc(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputInt(file)
+	in, err := parse.FileToIntSlice(file)
 	if err != nil {
 		log.Fatalf("countinc: file read error: %s", err)
 	}
@@ -41,7 +42,7 @@ func testCountInc(t *testing.T, file string, want int) {
 }
 
 func testCountIncThree(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputInt(file)
+	in, err := parse.FileToIntSlice(file)
 	if err != nil {
 		log.Fatalf("countincthree: file read error: %s", err)
 	}

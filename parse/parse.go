@@ -1,12 +1,14 @@
-package fetch
+package parse
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
-func ParseInputString(file string) ([]string, error) {
+func FileToStringSlice(file string) ([]string, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
@@ -21,8 +23,8 @@ func ParseInputString(file string) ([]string, error) {
 	return res, nil
 }
 
-func ParseInputInt(file string) ([]int, error) {
-	stringRes, err := ParseInputString(file)
+func FileToIntSlice(file string) ([]int, error) {
+	stringRes, err := FileToStringSlice(file)
 	if err != nil {
 		return nil, err
 	}
@@ -52,4 +54,12 @@ func IntToStringSlice(intSlice []int) []string {
 		strSlice[i] = s
 	}
 	return strSlice
+}
+
+func CommaSeparatedNumbers(s []string) []int {
+	intSlice, err := StringToIntSlice(strings.Split(s[0], ","))
+	if err != nil {
+		log.Fatalf("Converting inital string to pop: %s\n", err)
+	}
+	return intSlice
 }

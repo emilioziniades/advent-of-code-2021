@@ -7,6 +7,7 @@ import (
 
 	"github.com/emilioziniades/adventofcode2021/day2"
 	"github.com/emilioziniades/adventofcode2021/fetch"
+	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 func init() {
@@ -21,7 +22,7 @@ func TestMove(t *testing.T) {
 }
 
 func testMove(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputString(file)
+	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		log.Fatalf("move: file read error: %s", err)
 	}
@@ -39,7 +40,7 @@ func TestMoveAim(t *testing.T) {
 }
 
 func testMoveAim(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputString(file)
+	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		log.Fatalf("MoveAim: file read error: %s", err)
 	}

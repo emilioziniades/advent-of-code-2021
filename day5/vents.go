@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/emilioziniades/adventofcode2021/fetch"
+	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 type vent struct {
@@ -16,7 +16,7 @@ type ventMap [][]int
 func (vm ventMap) String() string {
 	s := ""
 	for i := range vm {
-		ss := fetch.IntToStringSlice(vm[i])
+		ss := parse.IntToStringSlice(vm[i])
 		s += strings.Replace(strings.Join(ss, ""), "0", ".", -1)
 		s += "\n"
 	}
@@ -124,7 +124,7 @@ func parseCoords(coords []string) []vent {
 	vents := make([]vent, 0)
 	for _, coord := range coords {
 		cString := strings.FieldsFunc(coord, split)
-		c, err := fetch.StringToIntSlice(cString)
+		c, err := parse.StringToIntSlice(cString)
 		if err != nil {
 			log.Fatalf("MapVents: parseCoords: %s", err)
 		}

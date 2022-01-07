@@ -7,6 +7,7 @@ import (
 
 	"github.com/emilioziniades/adventofcode2021/day5"
 	"github.com/emilioziniades/adventofcode2021/fetch"
+	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 func init() {
@@ -21,7 +22,7 @@ func TestMapVents(t *testing.T) {
 }
 
 func testMapVents(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputString(file)
+	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		t.Fatalf("Map Vents: Parsing Input: %s", err)
 	}
@@ -38,7 +39,7 @@ func TestMapVentsDiag(t *testing.T) {
 }
 
 func testMapVentsDiag(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputString(file)
+	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		t.Fatalf("Map Vents Diagonal: %s\n", err)
 	}

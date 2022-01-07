@@ -7,6 +7,7 @@ import (
 
 	"github.com/emilioziniades/adventofcode2021/day3"
 	"github.com/emilioziniades/adventofcode2021/fetch"
+	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 func init() {
@@ -21,7 +22,7 @@ func TestGammaDeltaProd(t *testing.T) {
 }
 
 func testGammaDeltaProd(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputString(file)
+	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		log.Fatalf("GammaDeltaProd: file read error: %s", err)
 	}
@@ -38,7 +39,7 @@ func TestOxygenCarbonDioxide(t *testing.T) {
 }
 
 func testOxygenCarbonDioxide(t *testing.T, file string, want int) {
-	in, err := fetch.ParseInputString(file)
+	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		log.Fatalf("Oxygen / C02 : file read error: %s", err)
 	}

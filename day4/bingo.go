@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/emilioziniades/adventofcode2021/fetch"
+	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 func main() {
@@ -114,7 +114,7 @@ func ParseBingo(file string) ([]Board, []int, error) {
 
 	// get numbers
 	input.Scan()
-	nums, err := fetch.StringToIntSlice(strings.Split(input.Text(), ","))
+	nums, err := parse.StringToIntSlice(strings.Split(input.Text(), ","))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -136,7 +136,7 @@ func ParseBingo(file string) ([]Board, []int, error) {
 			continue
 		}
 
-		row, err := fetch.StringToIntSlice(strings.Fields(input.Text()))
+		row, err := parse.StringToIntSlice(strings.Fields(input.Text()))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -148,7 +148,7 @@ func ParseBingo(file string) ([]Board, []int, error) {
 }
 
 func numBoards(file string) int {
-	lines, err := fetch.ParseInputString(file)
+	lines, err := parse.FileToStringSlice(file)
 	if err != nil {
 		log.Fatalf("Bingo: numBoards: %s", err)
 	}
