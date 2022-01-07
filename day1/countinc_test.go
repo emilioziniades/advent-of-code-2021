@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	err := fetch.FetchData("https://adventofcode.com/2021/day/1/input", "day1-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/1/input", "day1-input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

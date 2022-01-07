@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	fetch.FetchData("https://adventofcode.com/2021/day/4/input", "day4-input.txt")
+	fetch.Data("https://adventofcode.com/2021/day/4/input", "day4-input.txt")
 }
 func TestBingo(t *testing.T) {
 	testBingo(t, "day4-example.txt", 4512)

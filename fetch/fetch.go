@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func FetchData(url string, filename string) error {
+func Data(url string, filename string) error {
 	f, err := os.Open(filename)
 	defer f.Close()
 	if os.IsNotExist(err) {

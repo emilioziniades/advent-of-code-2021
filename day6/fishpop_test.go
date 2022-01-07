@@ -13,9 +13,9 @@ var benchIn []string
 var benchDays int
 
 func init() {
-	err := fetch.FetchData("https://adventofcode.com/2021/day/6/input", "day6-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/6/input", "day6-input.txt")
 	if err != nil {
-		log.Fatalf("FishPop: FetchData: %s\n", err)
+		log.Fatalf("FishPop: Data: %s\n", err)
 	}
 
 	benchIn, err = parse.FileToStringSlice("day6-input.txt")

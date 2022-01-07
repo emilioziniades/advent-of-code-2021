@@ -10,9 +10,9 @@ import (
 )
 
 func init() {
-	err := fetch.FetchData("https://adventofcode.com/2021/day/7/input", "day7-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/7/input", "day7-input.txt")
 	if err != nil {
-		log.Fatalf("day7: FetchData: %s", err)
+		log.Fatalf("day7: Data: %s", err)
 	}
 }
 

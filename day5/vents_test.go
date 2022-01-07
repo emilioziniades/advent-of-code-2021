@@ -11,9 +11,9 @@ import (
 )
 
 func init() {
-	err := fetch.FetchData("https://adventofcode.com/2021/day/5/input", "day5-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/5/input", "day5-input.txt")
 	if err != nil {
-		log.Fatalf("MapVents: FetchData: %s", err)
+		log.Fatalf("MapVents: Data: %s", err)
 	}
 }
 func TestMapVents(t *testing.T) {
