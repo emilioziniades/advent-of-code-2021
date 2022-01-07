@@ -17,17 +17,19 @@ func init() {
 }
 
 func TestMinFuel(t *testing.T) {
-	testMinFuel(t, "day7-example.txt", 37)
-	testMinFuel(t, "day7-input.txt", 347509)
+	testMinFuel(t, "day7-example.txt", 37, day7.CostConst)
+	testMinFuel(t, "day7-input.txt", 347509, day7.CostConst)
+	testMinFuel(t, "day7-example.txt", 168, day7.CostTriangle)
+	testMinFuel(t, "day7-input.txt", 98257206, day7.CostTriangle)
 }
 
-func testMinFuel(t *testing.T, file string, want int) {
+func testMinFuel(t *testing.T, file string, want int, costfunc func(float64) float64) {
 	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		t.Fatalf("testMinFuel: FileToStringSlice: %s", err)
 	}
 
-	got := day7.MinCost(parse.CommaSeparatedNumbers(in))
+	got := day7.MinCost(parse.CommaSeparatedNumbers(in), costfunc)
 	if got != want {
 		t.Fatalf("got %d, wanted %d for %s", got, want, file)
 	}
