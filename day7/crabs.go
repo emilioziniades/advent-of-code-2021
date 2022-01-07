@@ -1,7 +1,6 @@
 package day7
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -13,8 +12,7 @@ func MinCost(nums []int) int {
 	t := math.Inf(1)
 	min, max := findMinMax(nums)
 	for i := min; i <= max; i++ {
-		if c := Cost(nums, i); c < t {
-			fmt.Printf("Found lower cost %f if target is %d\n", c, i)
+		if c := cost(nums, i); c < t {
 			t = c
 		}
 	}
@@ -22,12 +20,12 @@ func MinCost(nums []int) int {
 
 }
 
-func Cost(nums []int, target int) float64 {
-	cost := float64(0)
+func cost(nums []int, target int) float64 {
+	c := float64(0)
 	for _, num := range nums {
-		cost += math.Abs(float64(num - target))
+		c += math.Abs(float64(num - target))
 	}
-	return cost
+	return c
 }
 
 func findMinMax(nums []int) (int, int) {

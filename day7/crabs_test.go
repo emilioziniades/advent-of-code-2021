@@ -1,6 +1,7 @@
 package day7_test
 
 import (
+	"log"
 	"testing"
 
 	"github.com/emilioziniades/adventofcode2021/day7"
@@ -9,11 +10,15 @@ import (
 )
 
 func init() {
-	err := fetch.FetchData()
+	err := fetch.FetchData("https://adventofcode.com/2021/day/7/input", "day7-input.txt")
+	if err != nil {
+		log.Fatalf("day7: FetchData: %s", err)
+	}
 }
 
 func TestMinFuel(t *testing.T) {
 	testMinFuel(t, "day7-example.txt", 37)
+	testMinFuel(t, "day7-input.txt", 347509)
 }
 
 func testMinFuel(t *testing.T, file string, want int) {
