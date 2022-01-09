@@ -31,6 +31,7 @@ func testLowPoints(t *testing.T, file string, want int) {
 
 func TestBasinCount(t *testing.T) {
 	testBasinCount(t, "day9-example.txt", 1134)
+	testBasinCount(t, "day9-input.txt", 736920)
 }
 
 func testBasinCount(t *testing.T, file string, want int) {

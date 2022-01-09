@@ -59,45 +59,45 @@ func CountBasins(file []string) int {
 	basins := make([]int, 0)
 
 	for _, lowpoint := range lowpoints {
-		basin := countBasin(hm, lowpoint.x, lowpoint.y)
+		basin := countBasin(hm, lowpoint)
 		basins = append(basins, basin)
 	}
 
 	sort.Sort(sort.Reverse(sort.IntSlice(basins)))
 	return basins[0] * basins[1] * basins[2]
 }
-func countBasin(hm [][]int, x, y int) int {
+func countBasin(hm [][]int, p point) int {
 	h, w := len(hm), len(hm[0])
 	visited := make(map[point]bool)
 
-	var countRec func(int, int)
-	countRec = func(x, y int) {
-		if visited[point{x, y}] || hm[y][x] == 9 {
+	var countRec func(point)
+	countRec = func(p point) {
+		if visited[p] || hm[p.y][p.x] == 9 {
 			return
 		}
-		visited[point{x, y}] = true
+		visited[p] = true
 
 		// has top
-		if !(y == 0) {
-			countRec(x, y-1)
+		if !(p.y == 0) {
+			countRec(point{p.x, p.y - 1})
 		}
 		// has bottom
-		if !(y == h-1) {
-			countRec(x, y+1)
+		if !(p.y == h-1) {
+			countRec(point{p.x, p.y + 1})
 		}
 		// has left
-		if !(x == 0) {
-			countRec(x-1, y)
+		if !(p.x == 0) {
+			countRec(point{p.x - 1, p.y})
 		}
 		// has right
-		if !(x == w-1) {
-			countRec(x+1, y)
+		if !(p.x == w-1) {
+			countRec(point{p.x + 1, p.y})
 		}
 
 		return
 	}
 
-	countRec(x, y)
+	countRec(p)
 	return len(visited)
 }
 
