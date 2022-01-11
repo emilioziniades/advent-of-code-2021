@@ -35,3 +35,26 @@ func TestErrorScore(t *testing.T) {
 	}
 
 }
+
+func TestCompletionScore(t *testing.T) {
+	var tests = []struct {
+		file string
+		want int
+	}{
+		{"10-example.txt", 288957},
+		{"10-input.txt", 2801302861},
+	}
+
+	for _, tt := range tests {
+		in, err := parse.FileToStringSlice(tt.file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		got := day10.CompletionScore(in)
+		if got != tt.want {
+			t.Fatalf("got %d, wanted %d, for %s", got, tt.want, tt.file)
+		}
+		t.Logf("got %d, wanted %d, for %s", got, tt.want, tt.file)
+	}
+
+}
