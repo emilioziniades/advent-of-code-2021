@@ -36,7 +36,7 @@ func testUniqueDigits(t *testing.T, file string, want int) {
 func TestFindDigits(t *testing.T) {
 	testFindDigits(t, "day8-simple.txt", 5353)
 	testFindDigits(t, "day8-example.txt", 61229)
-	testFindDigits(t, "day8-input.txt", 0)
+	testFindDigits(t, "day8-input.txt", 1023686)
 }
 
 func testFindDigits(t *testing.T, file string, want int) {
