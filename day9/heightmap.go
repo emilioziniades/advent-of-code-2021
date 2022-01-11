@@ -2,45 +2,41 @@ package day9
 
 import (
 	"sort"
-	"strings"
-
-	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
 type point struct {
 	x, y int
 }
 
-func LowPoints(fileSlice []string) (int, []point) {
-	heatmap := parseInputToHeatmap(fileSlice)
-	height, width := len(heatmap), len(heatmap[0])
+func LowPoints(grid [][]int) (int, []point) {
+	height, width := len(grid), len(grid[0])
 	risk := 0
 	lowpoints := make([]point, 0)
 
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 
-			current := heatmap[y][x]
+			current := grid[y][x]
 			neighbours := make([]int, 0)
 
 			//not top side, so has top neighbour
 			if !(y == 0) {
-				neighbours = append(neighbours, heatmap[y-1][x])
+				neighbours = append(neighbours, grid[y-1][x])
 			}
 
 			//not bottom side, so has bottom neighbour
 			if !(y == height-1) {
-				neighbours = append(neighbours, heatmap[y+1][x])
+				neighbours = append(neighbours, grid[y+1][x])
 			}
 
 			//not left side, so has left neighbour
 			if !(x == 0) {
-				neighbours = append(neighbours, heatmap[y][x-1])
+				neighbours = append(neighbours, grid[y][x-1])
 			}
 
 			//not right side, so has right neighbour
 			if !(x == width-1) {
-				neighbours = append(neighbours, heatmap[y][x+1])
+				neighbours = append(neighbours, grid[y][x+1])
 			}
 
 			sort.Ints(neighbours)
@@ -53,26 +49,25 @@ func LowPoints(fileSlice []string) (int, []point) {
 	return risk, lowpoints
 }
 
-func CountBasins(file []string) int {
-	_, lowpoints := LowPoints(file)
-	hm := parseInputToHeatmap(file)
+func CountBasins(grid [][]int) int {
+	_, lowpoints := LowPoints(grid)
 	basins := make([]int, 0)
 
 	for _, lowpoint := range lowpoints {
-		basin := countBasin(hm, lowpoint)
+		basin := countBasin(grid, lowpoint)
 		basins = append(basins, basin)
 	}
 
 	sort.Sort(sort.Reverse(sort.IntSlice(basins)))
 	return basins[0] * basins[1] * basins[2]
 }
-func countBasin(hm [][]int, p point) int {
-	h, w := len(hm), len(hm[0])
+func countBasin(grid [][]int, p point) int {
+	h, w := len(grid), len(grid[0])
 	visited := make(map[point]bool)
 
 	var countRec func(point)
 	countRec = func(p point) {
-		if visited[p] || hm[p.y][p.x] == 9 {
+		if visited[p] || grid[p.y][p.x] == 9 {
 			return
 		}
 		visited[p] = true
@@ -99,14 +94,4 @@ func countBasin(hm [][]int, p point) int {
 
 	countRec(p)
 	return len(visited)
-}
-
-func parseInputToHeatmap(fs []string) [][]int {
-	heatmap := make([][]int, len(fs))
-	for i, e := range fs {
-		digitsString := strings.Split(e, "")
-		digits, _ := parse.StringToIntSlice(digitsString)
-		heatmap[i] = append(heatmap[i], digits...)
-	}
-	return heatmap
 }

@@ -1,4 +1,5 @@
 package day9_test
+	grid := parse.InputToIntGrid(file)
 
 import (
 	"log"
@@ -18,7 +19,7 @@ func TestLowPoints(t *testing.T) {
 }
 
 func testLowPoints(t *testing.T, file string, want int) {
-	in, err := parse.FileToStringSlice(file)
+	in, err := parse.FileToIntGrid(file)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +36,7 @@ func TestBasinCount(t *testing.T) {
 }
 
 func testBasinCount(t *testing.T, file string, want int) {
-	in, err := parse.FileToStringSlice(file)
+	in, err := parse.FileToIntGrid(file)
 	if err != nil {
 		log.Fatal(err)
 	}
