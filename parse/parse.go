@@ -63,3 +63,24 @@ func CommaSeparatedNumbers(s []string) []int {
 	}
 	return intSlice
 }
+
+func stringSliceToGrid(fs []string) [][]int {
+	grid := make([][]int, len(fs))
+	for i, e := range fs {
+		digitsString := strings.Split(e, "")
+		digits, _ := StringToIntSlice(digitsString)
+		grid[i] = append(grid[i], digits...)
+	}
+	return grid
+}
+
+func FileToIntGrid(file string) ([][]int, error) {
+	fs, err := FileToStringSlice(file)
+	if err != nil {
+		return nil, err
+	}
+
+	grid := stringSliceToGrid(fs)
+	return grid, nil
+
+}
