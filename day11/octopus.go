@@ -5,8 +5,9 @@ import "fmt"
 var R = []int{-1, -1, -1, 0, 0, 1, 1, 1}
 var C = []int{-1, 0, 1, -1, 1, -1, 0, 1}
 
-func FlashCount(grid [][]int, steps int) int {
+func FlashCount(grid [][]int, steps int) (int, int) {
 	count := 0
+	syncStep := 10000000000
 	fmt.Println("Before any steps:")
 	printGrid(grid)
 	h, w := len(grid), len(grid[0])
@@ -33,7 +34,7 @@ func FlashCount(grid [][]int, steps int) int {
 
 		for len(q) > 0 {
 			curr := q.Dequeue()
-			//			fmt.Println("flashing", curr)
+			// flash neighbours
 			for n := 0; n < 8; n++ {
 				row, col := curr.R+R[n], curr.C+C[n]
 				if row >= 0 && row < h && col >= 0 && col < w {
@@ -56,12 +57,19 @@ func FlashCount(grid [][]int, steps int) int {
 				}
 			}
 		}
-		if i%10 == 0 {
+
+		if i%5 == 0 {
 			fmt.Printf("After step %d:\n", i)
 			printGrid(grid)
 		}
+
+		// checks if all octopi flashed in a single step.
+		// syncStep should only record the first instance of this
+		if len(flashed) == w*h && i < syncStep {
+			syncStep = i
+		}
 	}
-	return count
+	return count, syncStep
 }
 
 func printGrid(grid [][]int) {

@@ -33,10 +33,33 @@ func TestFlashCount(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		got := day11.FlashCount(in, tt.days)
+		got, _ := day11.FlashCount(in, tt.days)
 		if got != tt.want {
 			t.Fatalf("got %d, wanted %d for %s", got, tt.want, tt.file)
 		}
 		t.Logf("got %d, wanted %d for %s", got, tt.want, tt.file)
 	}
+}
+
+func TestSyncFlash(t *testing.T) {
+	var tests = []struct {
+		file string
+		want int
+		days int
+	}{
+		{"11-example.txt", 195, 200},
+		{"11-input.txt", 237, 300},
+	}
+	for _, tt := range tests {
+		in, err := parse.FileToIntGrid(tt.file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, got := day11.FlashCount(in, tt.days)
+		if got != tt.want {
+			t.Fatalf("got %d, wanted %d for %s", got, tt.want, tt.file)
+		}
+		t.Logf("got %d, wanted %d for %s", got, tt.want, tt.file)
+	}
+
 }
