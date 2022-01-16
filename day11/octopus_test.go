@@ -25,7 +25,7 @@ func TestFlashCount(t *testing.T) {
 		{"11-simple.txt", 9, 2},
 		{"11-example.txt", 204, 10},
 		{"11-example.txt", 1656, 100},
-		{"11-input.txt", 0, 100},
+		{"11-input.txt", 1729, 100},
 	}
 
 	for _, tt := range tests {
