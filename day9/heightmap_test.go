@@ -1,5 +1,4 @@
 package day9_test
-	grid := parse.InputToIntGrid(file)
 
 import (
 	"log"
