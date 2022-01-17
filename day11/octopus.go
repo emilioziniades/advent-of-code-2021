@@ -1,9 +1,17 @@
 package day11
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/emilioziniades/adventofcode2021/queue"
+)
 
 var R = []int{-1, -1, -1, 0, 0, 1, 1, 1}
 var C = []int{-1, 0, 1, -1, 1, -1, 0, 1}
+
+type point struct {
+	R, C int
+}
 
 func FlashCount(grid [][]int, steps int) (int, int) {
 	count := 0
@@ -21,7 +29,7 @@ func FlashCount(grid [][]int, steps int) (int, int) {
 
 		// Step 2 : Any octopus > 9 flashes. Neighbours increase by 1. Also flash if > 9
 		flashed := make(map[point]bool)
-		q := queue{}
+		q := queue.New[point]()
 		for r := 0; r < h; r++ {
 			for c := 0; c < w; c++ {
 				if grid[r][c] > 9 {
