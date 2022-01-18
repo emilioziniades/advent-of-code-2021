@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	fetch.Data("https://adventofcode.com/2021/day/12/input", "12-input.txt")
+	fetch.Data("https://adventofcode.com/2021/day/12/input", "12.in")
 }
 
 func TestCountPaths(t *testing.T) {
@@ -19,10 +19,10 @@ func TestCountPaths(t *testing.T) {
 		want    int
 		wantTwo int
 	}{
-		{"12-simple.txt", 10, 36},
-		{"12-example.txt", 19, 103},
-		{"12-large.txt", 226, 3509},
-		{"12-input.txt", 3410, 98796},
+		{"12.si", 10, 36},
+		{"12.ex", 19, 103},
+		{"12.la", 226, 3509},
+		{"12.in", 3410, 98796},
 	}
 
 	for _, tt := range tests {

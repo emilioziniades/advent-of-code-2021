@@ -10,11 +10,11 @@ import (
 )
 
 func init() {
-	fetch.Data("https://adventofcode.com/2021/day/9/input", "day9-input.txt")
+	fetch.Data("https://adventofcode.com/2021/day/9/input", "9.in")
 }
 func TestLowPoints(t *testing.T) {
-	testLowPoints(t, "day9-example.txt", 15)
-	testLowPoints(t, "day9-input.txt", 539)
+	testLowPoints(t, "9.ex", 15)
+	testLowPoints(t, "9.in", 539)
 }
 
 func testLowPoints(t *testing.T, file string, want int) {
@@ -30,8 +30,8 @@ func testLowPoints(t *testing.T, file string, want int) {
 }
 
 func TestBasinCount(t *testing.T) {
-	testBasinCount(t, "day9-example.txt", 1134)
-	testBasinCount(t, "day9-input.txt", 736920)
+	testBasinCount(t, "9.ex", 1134)
+	testBasinCount(t, "9.in", 736920)
 }
 
 func testBasinCount(t *testing.T, file string, want int) {

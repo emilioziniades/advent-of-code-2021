@@ -11,14 +11,14 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/2/input", "day2-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/2/input", "2.in")
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 func TestMove(t *testing.T) {
-	testMove(t, "day2-example.txt", 150)
-	testMove(t, "day2-input.txt", 1746616)
+	testMove(t, "2.ex", 150)
+	testMove(t, "2.in", 1746616)
 }
 
 func testMove(t *testing.T, file string, want int) {
@@ -35,8 +35,8 @@ func testMove(t *testing.T, file string, want int) {
 }
 
 func TestMoveAim(t *testing.T) {
-	testMoveAim(t, "day2-example.txt", 900)
-	testMoveAim(t, "day2-input.txt", 1741971043)
+	testMoveAim(t, "2.ex", 900)
+	testMoveAim(t, "2.in", 1741971043)
 }
 
 func testMoveAim(t *testing.T, file string, want int) {

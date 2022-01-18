@@ -10,15 +10,15 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/8/input", "day8-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/8/input", "8.in")
 	if err != nil {
 		log.Fatalf("fetch.Data: %s", err)
 	}
 }
 
 func TestUniqueDigits(t *testing.T) {
-	testUniqueDigits(t, "day8-example.txt", 26)
-	testUniqueDigits(t, "day8-input.txt", 381)
+	testUniqueDigits(t, "8.ex", 26)
+	testUniqueDigits(t, "8.in", 381)
 }
 func testUniqueDigits(t *testing.T, file string, want int) {
 	in, err := parse.FileToStringSlice(file)
@@ -34,9 +34,9 @@ func testUniqueDigits(t *testing.T, file string, want int) {
 }
 
 func TestFindDigits(t *testing.T) {
-	testFindDigits(t, "day8-simple.txt", 5353)
-	testFindDigits(t, "day8-example.txt", 61229)
-	testFindDigits(t, "day8-input.txt", 1023686)
+	testFindDigits(t, "8.si", 5353)
+	testFindDigits(t, "8.ex", 61229)
+	testFindDigits(t, "8.in", 1023686)
 }
 
 func testFindDigits(t *testing.T, file string, want int) {

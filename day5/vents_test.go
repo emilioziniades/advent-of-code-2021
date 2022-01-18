@@ -11,14 +11,14 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/5/input", "day5-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/5/input", "5.in")
 	if err != nil {
 		log.Fatalf("MapVents: Data: %s", err)
 	}
 }
 func TestMapVents(t *testing.T) {
-	testMapVents(t, "day5-example.txt", 5)
-	testMapVents(t, "day5-input.txt", 8622)
+	testMapVents(t, "5.ex", 5)
+	testMapVents(t, "5.in", 8622)
 }
 
 func testMapVents(t *testing.T, file string, want int) {
@@ -34,8 +34,8 @@ func testMapVents(t *testing.T, file string, want int) {
 }
 
 func TestMapVentsDiag(t *testing.T) {
-	testMapVentsDiag(t, "day5-example.txt", 12)
-	testMapVentsDiag(t, "day5-input.txt", 22037)
+	testMapVentsDiag(t, "5.ex", 12)
+	testMapVentsDiag(t, "5.in", 22037)
 }
 
 func testMapVentsDiag(t *testing.T, file string, want int) {

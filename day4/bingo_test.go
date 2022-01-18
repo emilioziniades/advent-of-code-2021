@@ -9,11 +9,11 @@ import (
 )
 
 func init() {
-	fetch.Data("https://adventofcode.com/2021/day/4/input", "day4-input.txt")
+	fetch.Data("https://adventofcode.com/2021/day/4/input", "4.in")
 }
 func TestBingo(t *testing.T) {
-	testBingo(t, "day4-example.txt", 4512)
-	testBingo(t, "day4-input.txt", 55770)
+	testBingo(t, "4.ex", 4512)
+	testBingo(t, "4.in", 55770)
 }
 func testBingo(t *testing.T, file string, want int) {
 	boards, nums, err := day4.ParseBingo(file)
@@ -28,8 +28,8 @@ func testBingo(t *testing.T, file string, want int) {
 }
 
 func TestLoseBingo(t *testing.T) {
-	testLoseBingo(t, "day4-example.txt", 1924)
-	testLoseBingo(t, "day4-input.txt", 2980)
+	testLoseBingo(t, "4.ex", 1924)
+	testLoseBingo(t, "4.in", 2980)
 }
 func testLoseBingo(t *testing.T, file string, want int) {
 	boards, nums, err := day4.ParseBingo(file)

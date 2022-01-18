@@ -11,14 +11,14 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/3/input", "day3-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/3/input", "3.in")
 	if err != nil {
 		log.Fatalf("Fetching data: %s", err)
 	}
 }
 func TestGammaDeltaProd(t *testing.T) {
-	testGammaDeltaProd(t, "day3-example.txt", 198)
-	testGammaDeltaProd(t, "day3-input.txt", 2261546)
+	testGammaDeltaProd(t, "3.ex", 198)
+	testGammaDeltaProd(t, "3.in", 2261546)
 }
 
 func testGammaDeltaProd(t *testing.T, file string, want int) {
@@ -34,8 +34,8 @@ func testGammaDeltaProd(t *testing.T, file string, want int) {
 }
 
 func TestOxygenCarbonDioxide(t *testing.T) {
-	testOxygenCarbonDioxide(t, "day3-example.txt", 230)
-	testOxygenCarbonDioxide(t, "day3-input.txt", 6775520)
+	testOxygenCarbonDioxide(t, "3.ex", 230)
+	testOxygenCarbonDioxide(t, "3.in", 6775520)
 }
 
 func testOxygenCarbonDioxide(t *testing.T, file string, want int) {

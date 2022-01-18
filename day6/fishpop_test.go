@@ -13,12 +13,12 @@ var benchIn []string
 var benchDays int
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/6/input", "day6-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/6/input", "6.in")
 	if err != nil {
 		log.Fatalf("FishPop: Data: %s\n", err)
 	}
 
-	benchIn, err = parse.FileToStringSlice("day6-input.txt")
+	benchIn, err = parse.FileToStringSlice("6.in")
 	if err != nil {
 		log.Fatalf("benchIn: %s", err)
 	}
@@ -27,35 +27,35 @@ func init() {
 }
 
 func TestFishPop(t *testing.T) {
-	testFishPopDict(t, "day6-example.txt", 5934, 80)
-	testFishPopDict(t, "day6-input.txt", 383160, 80)
-	testFishPopDict(t, "day6-example.txt", 26984457539, 256)
-	testFishPopDict(t, "day6-input.txt", 1721148811504, 256)
+	testFishPopDict(t, "6.ex", 5934, 80)
+	testFishPopDict(t, "6.in", 383160, 80)
+	testFishPopDict(t, "6.ex", 26984457539, 256)
+	testFishPopDict(t, "6.in", 1721148811504, 256)
 }
 
-func testFishPop(t *testing.T, file string, want int, days int) {
+func testFishPop(t *testing.T, file string, want int, s int) {
 	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		t.Fatalf("TestFishPop: FileToStringSlice: %s\n", err)
 	}
-	got := day6.FishPop(in, days)
+	got := day6.FishPop(in, s)
 	if got != want {
-		t.Fatalf("FishPop: wanted %d, got %d for %s after %d days\n", want, got, file, days)
+		t.Fatalf("FishPop: wanted %d, got %d for %s after %d s\n", want, got, file, s)
 	}
-	t.Logf("FishPop: wanted %d, got %d for %s after %d days\n", want, got, file, days)
+	t.Logf("FishPop: wanted %d, got %d for %s after %d s\n", want, got, file, s)
 
 }
 
-func testFishPopDict(t *testing.T, file string, want int, days int) {
+func testFishPopDict(t *testing.T, file string, want int, s int) {
 	in, err := parse.FileToStringSlice(file)
 	if err != nil {
 		t.Fatalf("TestFishPop: FileToStringSlice: %s\n", err)
 	}
-	got := day6.FishPopDict(in, days)
+	got := day6.FishPopDict(in, s)
 	if got != want {
-		t.Fatalf("FishPop: wanted %d, got %d for %s after %d days\n", want, got, file, days)
+		t.Fatalf("FishPop: wanted %d, got %d for %s after %d s\n", want, got, file, s)
 	}
-	t.Logf("FishPop: wanted %d, got %d for %s after %d days\n", want, got, file, days)
+	t.Logf("FishPop: wanted %d, got %d for %s after %d s\n", want, got, file, s)
 
 }
 

@@ -14,19 +14,19 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/1/input", "day1-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/1/input", "1.in")
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 func TestCountInc(t *testing.T) {
-	testCountInc(t, "day1-example.txt", 7)
-	testCountInc(t, "day1-input.txt", 1529)
+	testCountInc(t, "1.ex", 7)
+	testCountInc(t, "1.in", 1529)
 }
 
 func TestCountIncThree(t *testing.T) {
-	testCountIncThree(t, "day1-example.txt", 5)
-	testCountIncThree(t, "day1-input.txt", 1567)
+	testCountIncThree(t, "1.ex", 5)
+	testCountIncThree(t, "1.in", 1567)
 }
 
 func testCountInc(t *testing.T, file string, want int) {

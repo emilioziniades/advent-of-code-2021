@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/13/input", "13-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/13/input", "13.in")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,8 +21,8 @@ func TestFoldOne(t *testing.T) {
 		file string
 		want int
 	}{
-		{"13-example.txt", 17},
-		{"13-input.txt", 802},
+		{"13.ex", 17},
+		{"13.in", 802},
 	}
 
 	for _, tt := range tests {

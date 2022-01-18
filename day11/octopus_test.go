@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/11/input", "11-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/11/input", "11.in")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,12 +20,12 @@ func TestFlashCount(t *testing.T) {
 	var tests = []struct {
 		file string
 		want int
-		days int
+		s    int
 	}{
-		{"11-simple.txt", 9, 2},
-		{"11-example.txt", 204, 10},
-		{"11-example.txt", 1656, 100},
-		{"11-input.txt", 1729, 100},
+		{"11.si", 9, 2},
+		{"11.ex", 204, 10},
+		{"11.ex", 1656, 100},
+		{"11.in", 1729, 100},
 	}
 
 	for _, tt := range tests {
@@ -33,7 +33,7 @@ func TestFlashCount(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		got, _ := day11.FlashCount(in, tt.days)
+		got, _ := day11.FlashCount(in, tt.s)
 		if got != tt.want {
 			t.Fatalf("got %d, wanted %d for %s", got, tt.want, tt.file)
 		}
@@ -45,17 +45,17 @@ func TestSyncFlash(t *testing.T) {
 	var tests = []struct {
 		file string
 		want int
-		days int
+		s    int
 	}{
-		{"11-example.txt", 195, 200},
-		{"11-input.txt", 237, 300},
+		{"11.ex", 195, 200},
+		{"11.in", 237, 300},
 	}
 	for _, tt := range tests {
 		in, err := parse.FileToIntGrid(tt.file)
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, got := day11.FlashCount(in, tt.days)
+		_, got := day11.FlashCount(in, tt.s)
 		if got != tt.want {
 			t.Fatalf("got %d, wanted %d for %s", got, tt.want, tt.file)
 		}

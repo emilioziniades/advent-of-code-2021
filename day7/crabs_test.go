@@ -10,17 +10,17 @@ import (
 )
 
 func init() {
-	err := fetch.Data("https://adventofcode.com/2021/day/7/input", "day7-input.txt")
+	err := fetch.Data("https://adventofcode.com/2021/day/7/input", "7.in")
 	if err != nil {
-		log.Fatalf("day7: Data: %s", err)
+		log.Fatalf("7: Data: %s", err)
 	}
 }
 
 func TestMinFuel(t *testing.T) {
-	testMinFuel(t, "day7-example.txt", 37, day7.CostConst)
-	testMinFuel(t, "day7-input.txt", 347509, day7.CostConst)
-	testMinFuel(t, "day7-example.txt", 168, day7.CostTriangle)
-	testMinFuel(t, "day7-input.txt", 98257206, day7.CostTriangle)
+	testMinFuel(t, "7.ex", 37, day7.CostConst)
+	testMinFuel(t, "7.in", 347509, day7.CostConst)
+	testMinFuel(t, "7.ex", 168, day7.CostTriangle)
+	testMinFuel(t, "7.in", 98257206, day7.CostTriangle)
 }
 
 func testMinFuel(t *testing.T, file string, want int, costfunc func(float64) float64) {

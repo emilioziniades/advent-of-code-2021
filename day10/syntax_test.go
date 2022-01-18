@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	fetch.Data("https://adventofcode.com/2021/day/10/input", "10-input.txt")
+	fetch.Data("https://adventofcode.com/2021/day/10/input", "10.in")
 }
 
 func TestErrorScore(t *testing.T) {
@@ -18,8 +18,8 @@ func TestErrorScore(t *testing.T) {
 		file string
 		want int
 	}{
-		{"10-example.txt", 26397},
-		{"10-input.txt", 341823},
+		{"10.ex", 26397},
+		{"10.in", 341823},
 	}
 
 	for _, tt := range tests {
@@ -41,8 +41,8 @@ func TestCompletionScore(t *testing.T) {
 		file string
 		want int
 	}{
-		{"10-example.txt", 288957},
-		{"10-input.txt", 2801302861},
+		{"10.ex", 288957},
+		{"10.in", 2801302861},
 	}
 
 	for _, tt := range tests {
