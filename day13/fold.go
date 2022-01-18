@@ -44,19 +44,46 @@ func Fold(input []string, once bool) int {
 }
 
 func fold(p point, i instruction) point {
-	shift, fX, fY := float64(i.line), float64(p.x), float64(p.y)
+	shift, x, y := float64(i.line), float64(p.x), float64(p.y)
 	switch i.vertical {
 	case true:
-		newX := shift - math.Abs(fX-shift)
+		newX := shift - math.Abs(x-shift)
 		return point{int(newX), p.y}
 	case false:
-		newY := shift - math.Abs(fY-shift)
+		newY := shift - math.Abs(y-shift)
 		return point{p.x, int(newY)}
 	default:
 		return p
 	}
 }
 
+func printPaper(paper map[point]bool) {
+	w, h := findWidthHeight(paper)
+	for y := 0; y <= h; y++ {
+		for x := 0; x <= w; x++ {
+			if paper[point{x, y}] {
+				fmt.Print("# ")
+			} else {
+				fmt.Print("  ")
+			}
+		}
+		fmt.Print("\n")
+	}
+	fmt.Print("\n")
+}
+
+func findWidthHeight(paper map[point]bool) (int, int) {
+	w, h := 0, 0
+	for pt := range paper {
+		if pt.x > w {
+			w = pt.x
+		}
+		if pt.y > h {
+			h = pt.y
+		}
+	}
+	return w, h
+}
 func inputToPointsAndInstructions(input []string) ([]point, []instruction) {
 	points := make([]point, 0)
 	instructions := make([]instruction, 0)
@@ -82,31 +109,4 @@ func inputToPointsAndInstructions(input []string) ([]point, []instruction) {
 	}
 	return points, instructions
 
-}
-
-func findWidthHeight(paper map[point]bool) (int, int) {
-	w, h := 0, 0
-	for pt := range paper {
-		if pt.x > w {
-			w = pt.x
-		}
-		if pt.y > h {
-			h = pt.y
-		}
-	}
-	return w, h
-}
-func printPaper(paper map[point]bool) {
-	w, h := findWidthHeight(paper)
-	for y := 0; y <= h; y++ {
-		for x := 0; x <= w; x++ {
-			if paper[point{x, y}] {
-				fmt.Print("# ")
-			} else {
-				fmt.Print("  ")
-			}
-		}
-		fmt.Print("\n")
-	}
-	fmt.Print("\n")
 }
