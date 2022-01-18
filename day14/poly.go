@@ -1,7 +1,6 @@
 package day14
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -11,7 +10,7 @@ type pairCount struct {
 }
 
 func Polymer(in []string, steps int) int {
-	t, r := parseTemplateAndRules(in)
+	t, rules := parseTemplateAndRules(in)
 	pc := pairCount{m: make(map[string]int), begin: string(t[0]), end: string(t[len(t)-1])}
 
 	// parse initial template into pair count
@@ -29,7 +28,7 @@ func Polymer(in []string, steps int) int {
 		}
 
 		for k, v := range pc.m {
-			childPairs := r[k]
+			childPairs := rules[k]
 			cp1, cp2 := childPairs[0], childPairs[1]
 			curr[cp1] += v
 			curr[cp2] += v
@@ -39,29 +38,27 @@ func Polymer(in []string, steps int) int {
 		pc.m = curr
 	}
 
-	//count letters from pc into pairLetterCount (which includes duplicates)
-	pairLetterCount := make(map[string]int)
+	//count letters from pc into letterCount (which includes duplicates)
+	letterCount := make(map[string]int)
 	for k, v := range pc.m {
 		first, second := string(k[0]), string(k[1])
-		pairLetterCount[first] += v
-		pairLetterCount[second] += v
+		letterCount[first] += v
+		letterCount[second] += v
 	}
 
-	// dedup pairLetterCount into letterCount
-	letterCount := make(map[string]int)
-	for k, v := range pairLetterCount {
+	// deduplicate letterCount
+	for k, v := range letterCount {
 		if k == pc.begin || k == pc.end {
 			letterCount[k] = (v-1)/2 + 1
 		} else {
 			letterCount[k] = v / 2
 		}
 	}
-	fmt.Println(letterCount)
 	return diffMinMax(letterCount)
 }
 
 func diffMinMax(m map[string]int) int {
-	min, max := 1<<62, 0
+	min, max := (1<<63)-1, 0
 	for _, v := range m {
 		if v < min {
 			min = v

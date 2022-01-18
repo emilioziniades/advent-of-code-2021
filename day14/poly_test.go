@@ -34,8 +34,8 @@ func TestPolymer(t *testing.T) {
 		}
 		got := day14.Polymer(in, tt.steps)
 		if got != tt.want {
-			t.Fatalf("got %d, want %d, for %s", got, tt.want, tt.file)
+			t.Fatalf("got %d, want %d, after %d steps, for %s", got, tt.want, tt.steps, tt.file)
 		}
-		t.Logf("got %d, want %d, for %s", got, tt.want, tt.file)
+		t.Logf("got %d, want %d, after %d steps, for %s", got, tt.want, tt.steps, tt.file)
 	}
 }
