@@ -3,6 +3,8 @@ package day15
 import (
 	"fmt"
 	"math"
+
+	"github.com/emilioziniades/adventofcode2021/util"
 )
 
 type point struct {
@@ -77,14 +79,7 @@ func printResult(prevNode map[point]point, shortestPath map[point]int, start, en
 		node = prevNode[node]
 	}
 	path = append(path, start)
-	reverse(path)
+	util.Reverse(path)
 	fmt.Println(shortestPath[end], path)
 
-}
-
-func reverse[T any](t []T) {
-	for i := len(t)/2 -1; i >= 0; i-- {
-		opp := len(t) - 1 - i
-		t[i], t[opp] = t[opp], t[i]
-	}
 }
