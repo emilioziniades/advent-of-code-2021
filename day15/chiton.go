@@ -12,7 +12,7 @@ type point struct {
 	x, y int
 }
 
-func Dijkstra(grid [][]int) int {
+func ShortestPath(grid [][]int, heuristicFunc func(point, point) int) int {
 	h, w := len(grid), len(grid[0])
 	start := point{0, 0}
 	end := point{h - 1, w - 1}
@@ -41,12 +41,26 @@ func Dijkstra(grid [][]int) int {
 			if tentativeValue < shortestPath[n] {
 				shortestPath[n] = tentativeValue
 				prevNode[n] = currentMinNode
-				q.Enqueue(n, tentativeValue)
+				priority := tentativeValue + heuristicFunc(n, end)
+				q.Enqueue(n, priority)
 			}
 		}
 	}
-	printResult(prevNode, shortestPath, start, end)
 	return shortestPath[end]
+}
+
+func Dijkstra(grid [][]int) int {
+	noHeuristic := func(a, b point) int { return 0 }
+	return ShortestPath(grid, noHeuristic)
+}
+
+func AStar(grid [][]int) int {
+	return ShortestPath(grid, heuristic)
+}
+
+func AStarFivefold(grid [][]int) int {
+	bigGrid := extendGrid(grid)
+	return AStar(bigGrid)
 }
 
 func neighbours(p point, h, w int) []point {
@@ -63,6 +77,11 @@ func neighbours(p point, h, w int) []point {
 	return neighbours
 }
 
+func heuristic(a, b point) int {
+	// manhattan distance
+	return int(math.Abs(float64(a.x-b.x)) + math.Abs(float64(a.y-b.y)))
+}
+
 func printResult(prevNode map[point]point, shortestPath map[point]int, start, end point) {
 	path := make([]point, 0)
 	node := end
@@ -75,11 +94,6 @@ func printResult(prevNode map[point]point, shortestPath map[point]int, start, en
 	util.Reverse(path)
 	fmt.Println(shortestPath[end], path)
 
-}
-
-func DijkstraFivefold(grid [][]int) int {
-	bigGrid := extendGrid(grid)
-	return Dijkstra(bigGrid)
 }
 
 func extendGrid(grid [][]int) [][]int {
@@ -102,7 +116,5 @@ func extendGrid(grid [][]int) [][]int {
 			res = append(res, curr)
 		}
 	}
-	fmt.Println(len(res), len(res[0]))
-	//	util.PrintGrid(res)
 	return res
 }
