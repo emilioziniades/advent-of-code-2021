@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/emilioziniades/adventofcode2021/queue"
+	"github.com/emilioziniades/adventofcode2021/util"
 )
 
 var R = []int{-1, -1, -1, 0, 0, 1, 1, 1}
@@ -17,7 +18,7 @@ func FlashCount(grid [][]int, steps int) (int, int) {
 	count := 0
 	syncStep := 10000000000
 	fmt.Println("Before any steps:")
-	printGrid(grid)
+	util.PrintGrid(grid)
 	h, w := len(grid), len(grid[0])
 	for i := 1; i <= steps; i++ {
 		// Step 1 : increase every octopus' energy level by 1
@@ -68,7 +69,7 @@ func FlashCount(grid [][]int, steps int) (int, int) {
 
 		if i%5 == 0 {
 			fmt.Printf("After step %d:\n", i)
-			printGrid(grid)
+			util.PrintGrid(grid)
 		}
 
 		// checks if all octopi flashed in a single step.
@@ -78,14 +79,4 @@ func FlashCount(grid [][]int, steps int) (int, int) {
 		}
 	}
 	return count, syncStep
-}
-
-func printGrid(grid [][]int) {
-	for _, row := range grid {
-		for _, col := range row {
-			fmt.Printf("%v ", col)
-		}
-		fmt.Println("")
-	}
-	fmt.Println("")
 }

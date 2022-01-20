@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/emilioziniades/adventofcode2021/queue"
 	"github.com/emilioziniades/adventofcode2021/util"
 )
 
@@ -15,49 +16,40 @@ func Dijkstra(grid [][]int) int {
 	h, w := len(grid), len(grid[0])
 	start := point{0, 0}
 	end := point{h - 1, w - 1}
-	nilNode := point{-1, -1}
-	unvisited := make(map[point]bool)
-
+	prevNode := make(map[point]point)
+	shortestPath := make(map[point]int)
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
-			unvisited[point{x, y}] = true
+			shortestPath[point{x, y}] = math.MaxInt
 		}
-	}
-
-	shortestPath := make(map[point]int)
-	for node := range unvisited {
-		shortestPath[node] = math.MaxInt
 	}
 	shortestPath[start] = 0
-	prevNode := make(map[point]point)
 
-	for len(unvisited) > 0 {
-		currentMinNode := nilNode
+	q := queue.NewPriority[point]()
+	q.Enqueue(start, 0)
 
-		// finds node with lowest score
-		for node := range unvisited {
-			if currentMinNode == nilNode {
-				currentMinNode = node
-			} else if shortestPath[node] < shortestPath[currentMinNode] {
-				currentMinNode = node
-			}
+	for q.Len() > 0 {
+		currentMinNode := q.Dequeue().Value
+
+		if currentMinNode == end {
+			break
 		}
 
-		neighbours := getNeighbours(currentMinNode, h, w)
-		for _, n := range neighbours {
-			tentativeValue := shortestPath[currentMinNode] + grid[n.y][n.x]
+		for _, n := range neighbours(currentMinNode, h, w) {
+			cost := grid[n.y][n.x]
+			tentativeValue := shortestPath[currentMinNode] + cost
 			if tentativeValue < shortestPath[n] {
 				shortestPath[n] = tentativeValue
 				prevNode[n] = currentMinNode
+				q.Enqueue(n, tentativeValue)
 			}
 		}
-		delete(unvisited, currentMinNode)
 	}
 	printResult(prevNode, shortestPath, start, end)
 	return shortestPath[end]
 }
 
-func getNeighbours(p point, h, w int) []point {
+func neighbours(p point, h, w int) []point {
 	Y := []int{0, 1, 0, -1}
 	X := []int{1, 0, -1, 0}
 	neighbours := make([]point, 0)
@@ -70,6 +62,7 @@ func getNeighbours(p point, h, w int) []point {
 	}
 	return neighbours
 }
+
 func printResult(prevNode map[point]point, shortestPath map[point]int, start, end point) {
 	path := make([]point, 0)
 	node := end
@@ -82,4 +75,34 @@ func printResult(prevNode map[point]point, shortestPath map[point]int, start, en
 	util.Reverse(path)
 	fmt.Println(shortestPath[end], path)
 
+}
+
+func DijkstraFivefold(grid [][]int) int {
+	bigGrid := extendGrid(grid)
+	return Dijkstra(bigGrid)
+}
+
+func extendGrid(grid [][]int) [][]int {
+	h, _ := len(grid), len(grid[0])
+	res := make([][]int, h)
+
+	// fill horizontally first
+	for i := 0; i < h; i++ {
+		for j := 0; j < 5; j++ {
+
+			curr := util.Map(grid[i], func(n int) int { return (n+j-1)%9 + 1 })
+			res[i] = append(res[i], curr...)
+		}
+	}
+
+	// then fill vertically
+	for i := 1; i < 5; i++ {
+		for j := 0; j < h; j++ {
+			curr := util.Map(res[j], func(n int) int { return (n+i-1)%9 + 1 })
+			res = append(res, curr)
+		}
+	}
+	fmt.Println(len(res), len(res[0]))
+	//	util.PrintGrid(res)
+	return res
 }

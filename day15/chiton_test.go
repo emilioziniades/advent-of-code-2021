@@ -17,11 +17,14 @@ func init() {
 }
 func TestDijkstra(t *testing.T) {
 	tests := []struct {
-		file string
-		want int
+		file   string
+		want   int
+		extend bool
 	}{
-		{"15.ex", 40},
-		{"15.in", 472},
+		{"15.ex", 40, false},
+		{"15.in", 472, false},
+		//		{"15.ex", 315, true},
+		//		{"15.in", 0, true},
 	}
 
 	for _, tt := range tests {
@@ -30,7 +33,12 @@ func TestDijkstra(t *testing.T) {
 			log.Fatal(err)
 		}
 
-		got := day15.Dijkstra(in)
+		var got int
+		if tt.extend {
+			got = day15.DijkstraFivefold(in)
+		} else {
+			got = day15.Dijkstra(in)
+		}
 		if got != tt.want {
 			t.Fatalf("got %d, wanted %d, for %s", got, tt.want, tt.file)
 		}
