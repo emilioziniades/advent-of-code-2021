@@ -1,0 +1,73 @@
+Packet contains:
+    version - 3 bits
+    type ID - 3 bits
+    if type ID = 4, literal value
+        contains sets of 5 bits
+            done - 1 bit
+            value - 4 bits
+            end if done = 0
+    else operator value
+        operator value packet contains
+            length type ID - 1 bit
+                if ltID = 0
+                    length - 15 bits
+                    subpacket - length bits
+                else if ltD = 1
+                    length 11 bits
+                    subpacket - length subpackets
+            
+notes:
+
+the problem is that the bitsRead count does not include bits read by subsequent recursive calls, you could possibly update the value after recursive call reurns, based on the difference in lengths before and after recursive call. Or simply add the amount to be read to bitsRead before the recursive call. This second option works fine when length type id is 0, but you don't actually know how many bits are read if length type ID is 1. So you'll need to make a comparison. But don't do both because then you will double count the bits when length type ID is 0.
+
+
+current issue illustrated by this example:
+
+equal
+    sum
+        1
+        3
+    product
+        2
+        2
+
+In a stack: [ equal sum 1 3 product 2 2 ]
+
+Instead of reducing to [ equal 4 4 ], stack reduces to [ equal sum 1 3 4 ] -> [ equal 8 ], and then fails because equal tries to pop two items off the stack
+
+rather, the stack should reduce like this:
+
+[ equal sum 1 3 4 ]
+[equal 4 4 ]
+[ 1 ]
+
+The issue is that when two operations are parallell, the result of the first operation is included in the second operation. 
+
+My first thought is that a stack is the incorrect data structure for this problem, and that a tree is more appropriate. You simply need to reduce the tree upwards
+
+            equal
+         /        \
+        sum     product
+        /  \     /  \
+        1   3    2  2
+
+            equal
+         /        \
+        4       product
+                 /  \
+                 2  2
+    
+            equal
+         /        \
+         4        4
+
+              1
+
+Once I have the data in a tree structure, it should be pretty trivial to reduce the tree.
+
+Given that I can parse the encoded packets correctly, I now have two tasks:
+
+1. Parse into a tree
+2. Reduce tree to single number
+
+In terms of 1, it makes sense to do this whilst parsing packets, you would need to pass the current tree node in each recurisve call, and then append values to its children

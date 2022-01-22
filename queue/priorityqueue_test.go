@@ -26,7 +26,7 @@ func TestPriorityQueue(t *testing.T) {
 	pq.Enqueue(item.Value, item.Priority)
 
 	for pq.Len() > 0 {
-		curr := pq.Dequeue()
+		_ = pq.Dequeue()
 	}
 	if l := pq.Len(); l != 0 {
 		t.Fatalf("wanted 0, got %d for length of pq", l)
