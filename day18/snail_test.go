@@ -101,7 +101,7 @@ func TestMagnitude(t *testing.T) {
 		{[]string{"[[[[5,0],[7,4]],[5,5]],[6,6]]"}, 1137},
 		{[]string{"[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"}, 3488},
 		{ex2, 4140},
-		{in, 0},
+		{in, 4347},
 	}
 	for _, tt := range tests {
 		got := day18.Magnitude(tt.in)

@@ -23,7 +23,7 @@ func TestFindMaxY(t *testing.T) {
 		count int
 	}{
 		{"17.ex", 45, 112},
-		{"17.in", 4560, 0},
+		{"17.in", 4560, 3344},
 	}
 
 	for _, tt := range tests {
