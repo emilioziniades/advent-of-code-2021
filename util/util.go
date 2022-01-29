@@ -27,3 +27,11 @@ func PrintGrid(grid [][]int) {
 	fmt.Println("")
 }
 
+func Has[T comparable](slice []T, item T) bool {
+	for _,e := range slice {
+		if e == item {
+			return true
+		}
+	}
+	return false
+}
