@@ -14,6 +14,31 @@ var rad = map[int]float64{
 	270: (3.0 / 2.0) * math.Pi,
 }
 
+var rollTurnDict = make(map[int]string)
+
+func init() {
+	count := 0
+	steps := ""
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 3; j++ { // RTTT three times
+			// R
+			steps += "R"
+			rollTurnDict[count] = steps
+			count++
+			// TTT
+			for k := 0; k < 3; k++ {
+				steps += "T"
+				rollTurnDict[count] = steps
+				count++
+			}
+		}
+
+		// Do RTR
+		steps += "RTR"
+	}
+
+}
+
 // alpha: x-axis, beta: y-axis, gamma: z-axis
 func rotate(p point, alpha, beta, gamma float64) point {
 	pt := mat.NewDense(3, 1, []float64{
@@ -73,8 +98,6 @@ func unturn(p point) point {
 	return rotate(p, 0, 0, rad[270])
 }
 
-var rollTurnDict = make(map[int]string)
-
 // can arrive at all possible orientations via the sequence RTTTRTTTRTTT, then do (RTR), and then again RTTTRTTTRTTT
 func possibleOrientations(pts []point) [][]point {
 	res := make([][]point, 0)
@@ -84,20 +107,15 @@ func possibleOrientations(pts []point) [][]point {
 
 	for _, p := range pts {
 		c := 0
-		steps := ""
 		for i := 0; i < 2; i++ {
 			for j := 0; j < 3; j++ { // RTTT three times
 				// R
 				p = roll(p)
-				steps += "R"
-				rollTurnDict[c] = steps
 				res[c] = append(res[c], p)
 				c++
 				// TTT
 				for k := 0; k < 3; k++ {
 					p = turn(p)
-					steps += "T"
-					rollTurnDict[c] = steps
 					res[c] = append(res[c], p)
 					c++
 				}
@@ -105,7 +123,6 @@ func possibleOrientations(pts []point) [][]point {
 
 			// Do RTR
 			p = roll(turn(roll(p)))
-			steps += "RTR"
 		}
 	}
 
