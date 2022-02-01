@@ -1,6 +1,10 @@
 package util 
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"math"
+)
 
 func Reverse[T any](t []T) {
 	for i := len(t)/2 -1; i >= 0; i-- {
@@ -34,4 +38,20 @@ func Has[T comparable](slice []T, item T) bool {
 		}
 	}
 	return false
+}
+
+type Vector interface {
+	ToSlice() []int
+}
+
+func ManhattanDistance(a, b Vector) (res int) {
+	aa := a.ToSlice()
+	bb := b.ToSlice()
+	if len(aa) != len(bb) {
+		log.Fatal("vectors not equal dimensions")
+	}
+	for i := 0; i < len(aa); i++ {
+		res += int(math.Abs(float64(aa[i] - bb[i])))
+	}
+	return
 }

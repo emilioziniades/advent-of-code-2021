@@ -12,7 +12,12 @@ type point struct {
 	x, y int
 }
 
-func ShortestPath(grid [][]int, heuristicFunc func(point, point) int) int {
+// implementing util.Vector interface
+func (p point) ToSlice() []int {
+	return []int{p.x, p.y}
+}
+
+func ShortestPath(grid [][]int, heuristicFunc func(util.Vector, util.Vector) int) int {
 	h, w := len(grid), len(grid[0])
 	start := point{0, 0}
 	end := point{h - 1, w - 1}
@@ -50,12 +55,12 @@ func ShortestPath(grid [][]int, heuristicFunc func(point, point) int) int {
 }
 
 func Dijkstra(grid [][]int) int {
-	noHeuristic := func(a, b point) int { return 0 }
+	noHeuristic := func(a, b util.Vector) int { return 0 }
 	return ShortestPath(grid, noHeuristic)
 }
 
 func AStar(grid [][]int) int {
-	return ShortestPath(grid, heuristic)
+	return ShortestPath(grid, util.ManhattanDistance)
 }
 
 func AStarFivefold(grid [][]int) int {
@@ -75,11 +80,6 @@ func neighbours(p point, h, w int) []point {
 		}
 	}
 	return neighbours
-}
-
-func heuristic(a, b point) int {
-	// manhattan distance
-	return int(math.Abs(float64(a.x-b.x)) + math.Abs(float64(a.y-b.y)))
 }
 
 func printResult(prevNode map[point]point, shortestPath map[point]int, start, end point) {
