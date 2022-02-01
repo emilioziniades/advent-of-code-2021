@@ -36,7 +36,6 @@ func init() {
 		// Do RTR
 		steps += "RTR"
 	}
-
 }
 
 // alpha: x-axis, beta: y-axis, gamma: z-axis
@@ -129,7 +128,7 @@ func possibleOrientations(pts []point) [][]point {
 	return res
 }
 
-func unrollAndUnturn(steps string, p point) point {
+func unrollAndUnturn(p point, steps string) point {
 	res := p
 	n := len(steps) - 1
 	for i := 0; i <= n; i++ {
@@ -138,6 +137,20 @@ func unrollAndUnturn(steps string, p point) point {
 			res = unroll(res)
 		case 'T':
 			res = unturn(res)
+		}
+	}
+	return res
+}
+
+func rollAndTurn(p point, steps string) point {
+	res := p
+	n := len(steps) - 1
+	for i := 0; i <= n; i++ {
+		switch steps[i] {
+		case 'R':
+			res = roll(res)
+		case 'T':
+			res = turn(res)
 		}
 	}
 	return res

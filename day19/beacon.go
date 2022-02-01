@@ -20,6 +20,11 @@ func (p point) String() string {
 	return fmt.Sprintf("(%d,%d,%d)", p.x, p.y, p.z)
 }
 
+// implementing util.Vector interface
+func (p point) ToSlice() []int {
+	return []int{p.x, p.y, p.z}
+}
+
 type pair struct {
 	a, b point
 }
@@ -29,16 +34,17 @@ func (p pair) String() string {
 }
 
 type scanner struct {
-	points     []point
-	id         int
-	neighbours map[int]neighbour
-	done       bool
+	points       []point
+	id           int
+	zeroPosition point // position relative to scanner 0
+	neighbours   map[int]neighbour
+	done         bool
 }
 
 type neighbour struct {
-	rotationSteps string
-	position      point
-	id            int
+	id             int
+	rotationSteps  string
+	parentPosition point // position of parent relative to this neighbour
 }
 
 func (s scanner) makePairs() []pair {
@@ -59,8 +65,56 @@ func (s scanner) makePairs() []pair {
 	return pairs
 }
 
+// CountBeaconsAndScannerDistance returns the length of the set of beacons (all reoriented to be relative to scanner 0) and the maximum distance between two scanners
+func CountBeaconsAndScannerDistance(input []string) (int, int) {
+
+	scanners := parseInputToScanners(input)
+
+	// global set of beacons relative to scanner 0
+	allBeacons := make(map[point]bool)
+
+	// adjacency graph between scanners that share 12 points
+	adjacency := make(map[int][]int)
+
+	// no reorientation needed, so scanner 0 done
+	scanners[0].done = true
+
+	determineSharedBeacons(scanners, adjacency)
+
+	for k, _ := range scanners {
+		reorientBeaconsToZero(scanners, k, adjacency)
+		reorientScannersToZero(scanners, k, adjacency)
+	}
+
+	maxDist := math.MinInt
+	posList := make([]point, 0)
+
+	for _, v := range scanners {
+		posList = append(posList, v.zeroPosition)
+		if !v.done {
+			continue
+		}
+		for _, pt := range v.points {
+			allBeacons[pt] = true
+		}
+	}
+
+	for _, sA := range posList {
+		for _, sB := range posList {
+			if sA == sB {
+				continue
+			}
+			dist := util.ManhattanDistance(sA, sB)
+			if dist > maxDist {
+				maxDist = dist
+			}
+		}
+	}
+	return len(allBeacons), maxDist
+}
+
 /*
-Overall, these are the steps:
+Overall, these are the steps to deterrmine shared beacons:
 
 1. For each pair of scanners, do the following:
 	- consider all the pairs, and then compare distances between reports to find pairs which have the same distance
@@ -74,100 +128,42 @@ Overall, these are the steps:
 		a: d
 		b: e
 		c: f
-	- once you have a direct mapping of overlapping beacons, you can calculate the relative distance of scanner 1 relative to scanner 0
+	- once you have a direct mapping of overlapping beacons, you can calculate the relative position of scanner A relative to scanner B
+	- to determine the relative position, you need to try all possible orientations until scanner A and B and oriented the same way
 */
+func determineSharedBeacons(scanners map[int]*scanner, adjacencyGraph map[int][]int) {
 
-// CountBeacons returns the length of the set of beacons (all reoriented to be relative to scanner 0)
-func CountBeacons(input []string) int {
-
-//	test := point{-393,719,612}
-//	fmt.Println(unrollAndUnturn("RTTTRTTTRTTTRTRRTTTRTTTR", test))
-//	return 0
-
-	scanners := parseInputToScanners(input)
-
-	// global set of beacons relative to scanner 0
-	allBeacons := make(map[point]bool)
-	adjacency := make(map[int][]int)
-
-	// no reorientation needed, so scanner 0 done
-	scanners[0].done = true
-
-	determineSharedBeacons(allBeacons, scanners, adjacency)
-
-	for k, _ := range scanners {
-		if k < 2 || k == 4 {
-			reorientToZero(scanners, k, adjacency)
-		}
-	}
-	for _, v := range scanners {
-		curr := *v
-		fmt.Printf("scanner id: %d, done: %v\n", curr.id, curr.done)
-		for _, e := range curr.neighbours {
-			fmt.Printf("\tneighbour: %d, relative position: %v, steps: %s\n", e.id, e.position, e.rotationSteps)
-		}
-	}
-
-	for _, v := range scanners {
-		c := 0
-		if !v.done {
-			continue
-		}
-		for _, pt := range v.points {
-			_, ok := allBeacons[pt]
-			if !ok {
-				c++
-			}
-			allBeacons[pt] = true
-		}
-		fmt.Printf("scanner %d added %d new beacons\n", v.id, c)
-	}
-	return len(allBeacons)
-}
-
-func determineSharedBeacons(beaconSet map[point]bool, scanners map[int]*scanner, adjacencyGraph map[int][]int) {
-
+	fmt.Println("processing all scanner pairs...")
 	n := len(scanners)
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			if i == j {
 				continue
 			}
-			fmt.Printf("----------Processing scanner %d and scanner %d----------\n", j, i)
-			determineSharedBeaconsPairs(beaconSet, scanners[j], scanners[i], adjacencyGraph)
+			determineSharedBeaconsPairs(scanners[i], scanners[j], adjacencyGraph)
 		}
-	}
-
-	fmt.Println(adjacencyGraph)
-	for k, _ := range scanners {
-		fmt.Println(k, " : ", pathToZero(adjacencyGraph, k))
 	}
 }
 
-func determineSharedBeaconsPairs(beaconSet map[point]bool, scannerA, scannerB *scanner, adjacencyGraph map[int][]int) {
+func determineSharedBeaconsPairs(scannerA, scannerB *scanner, adjacencyGraph map[int][]int) {
 
 	pairsA := scannerA.makePairs()
 	pairsB := scannerB.makePairs()
 
-	// keys are points from scanner 0's perspective
-	bm := make(map[point]point)
+	// keys are points from scanner A's perspective
+	AtoBMap := make(map[point]point)
 
 	sA := stack.New[pair]()
 	sB := stack.New[pair]()
 
-	count := 0
-
 	for _, pA := range pairsA {
 		for _, pB := range pairsB {
-			if d0, d1 := distance(pA), distance(pB); d0 == d1 {
-				count++
-				//				fmt.Printf("equal distance = %f between points %v and %v\n", d0, pA, pB)
+			if distance(pA) == distance(pB) {
 				sA.PushLeft(pA)
 				sB.PushLeft(pB)
 			}
 		}
 	}
-	fmt.Printf("\tFound %d pairs with equal distances\n", count)
 
 	for len(sA) > 0 && len(sB) > 0 {
 
@@ -184,21 +180,21 @@ func determineSharedBeaconsPairs(beaconSet map[point]bool, scannerA, scannerB *s
 		if c.a == d.a {
 			switch {
 			case e.a == f.a:
-				bm[c.a] = e.a
-				bm[c.b] = e.b
-				bm[d.b] = f.b
+				AtoBMap[c.a] = e.a
+				AtoBMap[c.b] = e.b
+				AtoBMap[d.b] = f.b
 			case e.a == f.b:
-				bm[c.a] = e.a
-				bm[c.b] = e.b
-				bm[d.b] = f.a
+				AtoBMap[c.a] = e.a
+				AtoBMap[c.b] = e.b
+				AtoBMap[d.b] = f.a
 			case e.b == f.a:
-				bm[c.a] = e.b
-				bm[c.b] = e.a
-				bm[d.b] = f.b
+				AtoBMap[c.a] = e.b
+				AtoBMap[c.b] = e.a
+				AtoBMap[d.b] = f.b
 			case e.b == f.b:
-				bm[c.a] = e.b
-				bm[c.b] = e.a
-				bm[d.b] = f.a
+				AtoBMap[c.a] = e.b
+				AtoBMap[c.b] = e.a
+				AtoBMap[d.b] = f.a
 			}
 		}
 	}
@@ -206,14 +202,12 @@ func determineSharedBeaconsPairs(beaconSet map[point]bool, scannerA, scannerB *s
 	overlapA := make([]point, 0)
 	overlapB := make([]point, 0)
 
-	fmt.Printf("\t%d common beacons determined\n", len(bm))
-	if len(bm) < 12 {
-		fmt.Println("\tnot enough common beacons")
+	if len(AtoBMap) < 12 {
+		// insufficient shared beacons
 		return
 	}
 
-	for k, v := range bm {
-		fmt.Println(k, " :: ", v)
+	for k, v := range AtoBMap {
 		overlapA = append(overlapA, k)
 		overlapB = append(overlapB, v)
 	}
@@ -221,8 +215,9 @@ func determineSharedBeaconsPairs(beaconSet map[point]bool, scannerA, scannerB *s
 	// this is the position of scannerB relative to scannerA
 	var positionBA *point
 loop:
+	// keep rotating B's beacons until they are in the same orientation as A
+	// (we'll know this since the difference between A and B will be a single point - the position of B relative to A's position )
 	for index, points := range possibleOrientations(overlapB) {
-		//		fmt.Println(points)
 		for i, pA := range overlapA {
 			pB := points[i]
 			attempt := point{pA.x - pB.x, pA.y - pB.y, pA.z - pB.z}
@@ -231,15 +226,11 @@ loop:
 				continue
 			}
 			if *positionBA == attempt {
-				//					fmt.Println(pA, pB, attempt)
-				//					fmt.Println("works so far")
 				if i == 11 {
-					//TODO currently, this finds position relative to scannerA, and more work required to find position relative to scanner0, which may not necessarily be scannerA
-					fmt.Println("\tFound scanner position!!! - ", positionBA)
 					currNeighbour := neighbour{
-						position:      *positionBA,
-						rotationSteps: rollTurnDict[index],
-						id:            scannerA.id,
+						parentPosition: *positionBA,
+						rotationSteps:  rollTurnDict[index],
+						id:             scannerA.id,
 					}
 
 					scannerB.neighbours[currNeighbour.id] = currNeighbour
@@ -247,31 +238,14 @@ loop:
 					break loop
 				}
 			} else {
-				//fmt.Printf("doesn't work. distance between %v and %v is %v, but want %v\n", pA, pB, attempt, positionBA)
 				positionBA = nil
 				break
 			}
 		}
 	}
-	/*
-			// do the reverse rotation for all scannerB beacons
-			fmt.Printf("Currently reorienting scanners from scanner %d to be relative to %d\n", scannerB.id, scannerB.relativeTo)
-			for i, e := range scannerB.points {
-			// do reverse of current orientation for all of scannerB's points,
-		// so that they are in the correct orientation relative to scanner A
-				reoriented := unrollAndUnturn(scannerB.rotationSteps, e)
-				shifted := point{reoriented.x + scannerB.position.x, reoriented.y + scannerB.position.y, reoriented.z + scannerB.position.z}
-				scannerB.points[i] = shifted
-				if scannerB.relativeTo == 0 {
-					beaconSet[shifted] = true
-				}
-
-			}
-			fmt.Printf("scanner %d positions now relative to scanner %d\n", scannerB.id, scannerB.relativeTo)
-		//	*/
 }
 
-// pathToZero finds a possible sequence of reorientations from scanner n to scanner 0
+// pathToZero finds a possible sequence of reorientations from scanner n to scanner 0 using BFS
 func pathToZero(adjacencyGraph map[int][]int, start int) stack.Stack[int] {
 	end := 0
 	q := stack.New[int]()
@@ -301,41 +275,49 @@ func pathToZero(adjacencyGraph map[int][]int, start int) stack.Stack[int] {
 	return path
 }
 
-func reorientToZero(scanners map[int]*scanner, id int, adjacencyGraph map[int][]int) {
+func reorientBeaconsToZero(scanners map[int]*scanner, id int, adjacencyGraph map[int][]int) {
 	path := pathToZero(adjacencyGraph, id)
-	fmt.Printf("----------Reorienting points from scanner %d to be relative to scanner 0 via path %v----------\n", id, path)
-
 	// pop starting point off stack
-	var prev int
-	curr := path.PopLeft()
+	var curr int
+	next := path.PopLeft()
 	thisScanner := scanners[id]
-	var currNeighbour neighbour
-	for curr != 0 {
-		prev = curr
-		curr = path.PopLeft()
-		currNeighbour = scanners[prev].neighbours[curr]
-		fmt.Printf("\treorienting from scanner %d --> scanner %d\n", prev, curr)
-		fmt.Printf("\tUsing rotation steps %s and relative position %v of scanner %d from perspective of %d\n", currNeighbour.rotationSteps, currNeighbour.position, currNeighbour.id, prev)
-		fmt.Println("\t", currNeighbour)
-
-		// reorient and shift scanner position
-		//		reorientScanner := unrollAndUnturn(currNeighbour.rotationSteps, thisScanner.position)
-		//		shiftScanner :=
-
+	var nextNeighbour neighbour
+	for next != 0 {
+		curr = next
+		next = path.PopLeft()
+		nextNeighbour = scanners[curr].neighbours[next]
 		// reorient and shift beacon positions
 		for i, pt := range thisScanner.points {
-			reorientedPt := unrollAndUnturn(currNeighbour.rotationSteps, pt)
-			shiftedPt := point{reorientedPt.x + currNeighbour.position.x, reorientedPt.y + currNeighbour.position.y, reorientedPt.z + currNeighbour.position.z}
-			thisScanner.points[i] = shiftedPt
-
+			thisScanner.points[i] = shift(rollAndTurn(pt, nextNeighbour.rotationSteps), nextNeighbour.parentPosition)
 		}
 	}
-//	fmt.Println("\t\t", thisScanner.points)
 	thisScanner.done = true
 }
 
+func reorientScannersToZero(scanners map[int]*scanner, id int, adjacencyGraph map[int][]int) {
+	path := pathToZero(adjacencyGraph, id)
+	thisScanner := scanners[id]
+
+	if len(path) <= 1 {
+		// scanner 0 already has position (0, 0, 0)
+		return
+	}
+
+	_ = path.PopLeft()
+	curr := path.PopLeft()
+	var next int
+	thisScanner.zeroPosition = thisScanner.neighbours[curr].parentPosition
+
+	for len(path) > 0 {
+		next = path.PopLeft()
+		thisScanner.zeroPosition = shift(rollAndTurn(thisScanner.zeroPosition, scanners[curr].neighbours[next].rotationSteps), scanners[curr].neighbours[next].parentPosition)
+		curr = next
+	}
+	return
+}
+
 func parseInputToScanners(input []string) map[int]*scanner {
-	re := regexp.MustCompile(`---\sscanner\s(\d)\s---`)
+	re := regexp.MustCompile(`---\sscanner\s(\d+)\s---`)
 	var currentScanner int
 	scanners := make(map[int]*scanner)
 
@@ -373,4 +355,8 @@ func distance(p pair) float64 {
 	diffy := float64(p.a.y - p.b.y)
 	diffz := float64(p.a.z - p.b.z)
 	return math.Sqrt(math.Pow(diffx, 2) + math.Pow(diffy, 2) + math.Pow(diffz, 2))
+}
+
+func shift(a, b point) point {
+	return point{a.x + b.x, a.y + b.y, a.z + b.z}
 }
