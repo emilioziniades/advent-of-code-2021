@@ -1,4 +1,4 @@
-package util 
+package util
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 func Reverse[T any](t []T) {
-	for i := len(t)/2 -1; i >= 0; i-- {
+	for i := len(t)/2 - 1; i >= 0; i-- {
 		opp := len(t) - 1 - i
 		t[i], t[opp] = t[opp], t[i]
 	}
@@ -32,7 +32,7 @@ func PrintGrid(grid [][]int) {
 }
 
 func Has[T comparable](slice []T, item T) bool {
-	for _,e := range slice {
+	for _, e := range slice {
 		if e == item {
 			return true
 		}

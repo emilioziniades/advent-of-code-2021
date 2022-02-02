@@ -19,7 +19,7 @@ func TestStack(t *testing.T) {
 	}
 	fmt.Println(s)
 
-	if x := (Stack[int]{3,2}); !reflect.DeepEqual(x, s) {
+	if x := (Stack[int]{3, 2}); !reflect.DeepEqual(x, s) {
 		t.Fatalf("got %#v, wanted %#v", s, x)
 	}
 	fmt.Println(s)

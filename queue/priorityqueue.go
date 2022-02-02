@@ -3,9 +3,9 @@ package queue
 import "container/heap"
 
 type Item[T any] struct {
-	Value T
+	Value    T
 	Priority int
-	index int
+	index    int
 }
 
 type PriorityQueue[T any] []*Item[T]
@@ -36,12 +36,12 @@ func (pq *PriorityQueue[T]) Pop() interface{} {
 	n := len(old)
 	item := old[n-1]
 	item.index = -1
-	*pq = old[0: n - 1]
+	*pq = old[0 : n-1]
 	return item
 }
 
 func NewPriority[T any]() PriorityQueue[T] {
-	
+
 	pq := make(PriorityQueue[T], 0)
 	heap.Init(&pq)
 	return pq
@@ -49,12 +49,12 @@ func NewPriority[T any]() PriorityQueue[T] {
 
 func (pq *PriorityQueue[T]) Enqueue(x T, p int) {
 	item := Item[T]{
-		Value: x,
+		Value:    x,
 		Priority: p,
 	}
 	heap.Push(pq, &item)
 }
 func (pq *PriorityQueue[T]) Dequeue() Item[T] {
-	x:= heap.Pop(pq).(*Item[T])
+	x := heap.Pop(pq).(*Item[T])
 	return *x
 }

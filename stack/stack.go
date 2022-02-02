@@ -11,7 +11,7 @@ func (s *Stack[T]) Pop() T {
 		log.Fatal("Stack is empty")
 	}
 	x := old[n-1]
-	*s = old[0 : n - 1]
+	*s = old[0 : n-1]
 	return x
 }
 
@@ -22,7 +22,7 @@ func (s *Stack[T]) PopLeft() T {
 		log.Fatal("Stack is empty")
 	}
 	x := old[0]
-	*s = old[1 : n]
+	*s = old[1:n]
 	return x
 }
 
@@ -31,10 +31,8 @@ func (s *Stack[T]) Push(x T) {
 }
 
 func (s *Stack[T]) PushLeft(x T) {
-	*s = append([]T{x},*s...)
+	*s = append([]T{x}, *s...)
 }
-
-
 
 func New[T any]() Stack[T] {
 	return Stack[T]{}
