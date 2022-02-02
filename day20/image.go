@@ -1,54 +1,60 @@
 package day20
 
-import (
-	"fmt"
-	"log"
-)
-
 func Enhance(input []string, n int) int {
-	//	for j := 0; j < 40; j++ {
-	image, rule := parseImageAndRule(input, 300)
-	//		fmt.Println(len(image), len(image[0]))
+	pad := n + 1
+	image, rule := parseImageAndRule(input, pad)
 	current := image
-	//		fmt.Println(rule)
-	//		fmt.Println("\nbefore enhancing: ")
-	//		util.PrintGrid(current)
-	var next [][]int
-	for i := 0; i < 2; i++ {
+	next := make([][]int, 0)
+	for i := 0; i < n; i++ {
 		next = enhance(current, rule)
-		//			fmt.Printf("enhancing, round %d\n", i+1)
-		//			util.PrintGrid(next)
-		//		return 35
 		current = next
 
 	}
-	fmt.Printf("with %d padding, result is %d\n", 300, countOnes(current))
-	//	}
 	return countOnes(current)
 }
 
 func enhance(image [][]int, rule string) [][]int {
 	newimage := makeGrid(len(image), len(image[0]))
-	rstart := 1
-	cstart := 1
-	rend := len(image) - 2
-	cend := len(image[0]) - 2
-
 	RC := []int{-1, 0, 1}
 
-	for r := rstart; r <= rend; r++ {
-		for c := cstart; c <= cend; c++ {
-			// get 3 x 3 surrounding this point
-			pixel := make([]int, 0)
-			for _, rr := range RC {
-				for _, cc := range RC {
-					pixel = append(pixel, image[r+rr][c+cc])
+	// need to set all boundary points, but they need special treatment
+	// can't do this normally because they don't have a 3 x 3 around them
+	// but, their values will be uniform, all 0s or all 1s, and so their
+	// value can be determined by the first and last indexes of the rule
+	var zeroval int
+	var oneval int
+	if rule[0] == '#' {
+		zeroval = 1
+	}
+	if rule[len(rule)-1] == '#' {
+		oneval = 1
+	}
+
+	for r := range image {
+		for c := range image[0] {
+			if r == 0 || r == len(image)-1 || c == 0 || c == len(image[0])-1 {
+				// pixel on boundary
+				switch image[r][c] {
+				case 1:
+					newimage[r][c] = oneval
+				case 0:
+					newimage[r][c] = zeroval
 				}
+
+			} else {
+				// pixel not on boundary, get 3 x 3 surrounding this point
+				pixel := make([]int, 0)
+				for _, rr := range RC {
+					for _, cc := range RC {
+						pixel = append(pixel, image[r+rr][c+cc])
+					}
+				}
+				newimage[r][c] = pixelToInt(pixel, rule)
 			}
-			newimage[r][c] = pixelToInt(pixel, rule)
 
 		}
 	}
+
 	return newimage
 }
 
@@ -59,7 +65,7 @@ func pixelToInt(pixel []int, rule string) int {
 		bit := l - i
 		n += e << bit
 	}
-	if s := string(rule[n]); s == "#" {
+	if rule[n] == '#' {
 		return 1
 	} else {
 		return 0
@@ -75,7 +81,7 @@ func countOnes(image [][]int) (count int) {
 			case 0:
 				continue
 			default:
-				log.Fatal("countOnes: something has gone wrong")
+				panic("countOnes: pixel neither 1 or 0")
 			}
 		}
 	}
@@ -92,10 +98,10 @@ func parseImageAndRule(input []string, padding int) ([][]int, string) {
 		}
 		grid[row] = make([]int, 0)
 		for _, e := range line {
-			switch string(e) {
-			case "#":
+			switch e {
+			case '#':
 				grid[row] = append(grid[row], 1)
-			case ".":
+			case '.':
 				grid[row] = append(grid[row], 0)
 			}
 		}

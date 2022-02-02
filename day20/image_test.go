@@ -18,18 +18,21 @@ func init() {
 
 func TestEnhance(t *testing.T) {
 	tests := []struct {
-		file string
-		want int
+		file  string
+		want  int
+		times int
 	}{
-		{"20.ex", 35},
-		{"20.in", 0},
+		{"20.ex", 35, 2},
+		{"20.ex", 3351, 50},
+		{"20.in", 5354, 2},
+		{"20.in", 18269, 50},
 	}
 	for _, tt := range tests {
 		in, err := parse.FileToStringSlice(tt.file)
 		if err != nil {
 			t.Fatal(err)
 		}
-		got := day20.Enhance(in, 2)
+		got := day20.Enhance(in, tt.times)
 		if got != tt.want {
 			t.Fatalf("got %d, wanted %d, for %s", got, tt.want, tt.file)
 		} else {
