@@ -22,7 +22,7 @@ func TestPlay(t *testing.T) {
 		quantum       int
 	}{
 		{"21.ex", 739785, 444356092776315},
-		{"21.in", 671580, 0},
+		{"21.in", 671580, 912857726749764},
 	}
 	for _, tt := range tests {
 		in, err := parse.FileToStringSlice(tt.file)

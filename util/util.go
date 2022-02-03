@@ -55,3 +55,11 @@ func ManhattanDistance(a, b Vector) (res int) {
 	}
 	return
 }
+
+func CopyMap[K comparable, V any](m map[K]V) map[K]V {
+	newM := make(map[K]V)
+	for k, v := range m {
+		newM[k] = v
+	}
+	return newM
+}

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+
+	"github.com/emilioziniades/adventofcode2021/util"
 )
 
 type player struct {
@@ -14,7 +16,7 @@ type player struct {
 }
 
 func (p *player) move(n int) {
-	p.position = (p.position-1+n)%10 + 1 // positions from 1 - 10
+	p.position = (p.position+n-1)%10 + 1 // positions from 1 - 10
 	p.score += p.position
 }
 
@@ -29,6 +31,22 @@ func (d *dice) roll() int {
 	return d.current
 }
 
+type state struct {
+	player1, player2 player
+	player1turn      bool
+}
+
+func (s state) String() string {
+	var turn int
+	if s.player1turn {
+		turn = 1
+	} else {
+		turn = 2
+	}
+	format := "( p%d position %d, score %d // p%d position %d, score %d // player %d turn )"
+	return fmt.Sprintf(format, s.player1.id, s.player1.position, s.player1.score, s.player2.id, s.player2.position, s.player2.score, turn)
+}
+
 func Play(input []string) int {
 	dice := dice{}
 	players := setupPlayers(input)
@@ -38,8 +56,6 @@ game:
 		for i := 1; i <= len(players); i++ {
 			n1, n2, n3 := dice.roll(), dice.roll(), dice.roll()
 			players[i].move(n1 + n2 + n3)
-			//			fmt.Printf("player %d rolled %d + %d + %d = %d to position %d for a total score of %d\n", i, n1, n2, n3, n1+n2+n3, players[i].position, players[i].score)
-
 			if players[i].score >= 1000 {
 				players[i].winner = true
 				break game
@@ -56,54 +72,56 @@ game:
 }
 
 func PlayDirac(input []string) int {
-	players := setupPlayers(input)
-	// dereference pointer so that copies can be passed to recursive function
-	player1 := *players[1]
-	player2 := *players[2]
-	winCount := make(map[int]int)
 
-	var recursivePlay func(player, player)
-	recursivePlay = func(p1, p2 player) {
-		// 3 * 3 * 3 = 27 possible universes for each player turn
-		for n1 := 1; n1 <= 3; n1++ {
-			for n2 := 1; n2 <= 3; n2++ {
-				for n3 := 1; n3 <= 3; n3++ {
-					//					fmt.Printf("%p\n", &p1)
-					fmt.Println(p1)
-					// player 1 moves
-					p1.move(n1 + n2 + n3)
-					if p1.score >= 21 {
-						winCount[1] += 1
-						return
-					}
-					for n4 := 1; n4 <= 3; n4++ {
-						for n5 := 1; n5 <= 3; n5++ {
-							for n6 := 1; n6 <= 3; n6++ {
-								fmt.Println(p2)
-								// player 2 moves
-								p2.move(n4 + n5 + n6)
-								if p2.score >= 21 {
-									winCount[2] += 1
-									return
-								} else {
-									recursivePlay(p1, p2)
-								}
-							}
+	players := setupPlayers(input)
+	universes := make(map[state]int)
+	winCount := make(map[int]int)
+	initialState := state{player1: *players[1], player2: *players[2], player1turn: true}
+	universes[initialState] = 1
+
+	// whilst there are still uncompleted universes
+	for len(universes) > 0 {
+		newuniverses := util.CopyMap(universes)
+		// iterate over each state
+		for s, c := range universes {
+			delete(newuniverses, s)
+
+			// end if there is a winner
+			if s.player1.score >= 21 {
+				winCount[1] += c
+				continue
+			} else if s.player2.score >= 21 {
+				winCount[2] += c
+				continue
+			}
+			// create 27 copies of current state, 1 for each possible combination of dice rolls
+			for n1 := 1; n1 <= 3; n1++ {
+				for n2 := 1; n2 <= 3; n2++ {
+					for n3 := 1; n3 <= 3; n3++ {
+						sum := n1 + n2 + n3
+						currState := s
+						switch currState.player1turn {
+						case true:
+							currState.player1.move(sum)
+							currState.player1turn = false
+						case false:
+							currState.player2.move(sum)
+							currState.player1turn = true
 						}
+						newuniverses[currState] += c
 					}
 				}
 			}
 		}
+		universes = util.CopyMap(newuniverses)
 	}
 
-	recursivePlay(player1, player2)
+	if winCount[1] > winCount[2] {
+		return winCount[1]
+	} else {
+		return winCount[2]
+	}
 
-	fmt.Println(winCount)
-	return 0
-
-	//game:
-	//	for {
-	//	}
 }
 
 func setupPlayers(input []string) map[int]*player {
