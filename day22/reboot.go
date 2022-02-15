@@ -43,9 +43,9 @@ func (c cuboid) Volume() int {
 }
 
 func Reboot(input []string, bounds float64) int {
-	reactor := make(map[point]bool)
+	// reactor := make(map[point]bool)
+	reactor := make(map[cuboid]bool)
 	cuboids := stack.New[cuboid]()
-	// cuboids := make([]cuboid, 0)
 	re := regexp.MustCompile(`([a-z]+).*?(-?\d+).*?(-?\d+).*?(-?\d+).*?(-?\d+).*?(-?\d+).*?(-?\d+)`)
 	for _, line := range input {
 		if re.MatchString(line) {
@@ -60,12 +60,11 @@ func Reboot(input []string, bounds float64) int {
 
 			currCuboid := newCuboid(point{xS, yS, zS}, point{xE, yE, zE}, on)
 			cuboids.Push(currCuboid)
-			fmt.Println(currCuboid)
-			fmt.Println(line)
-			fmt.Println(currCuboid.Volume())
-			continue
+			// fmt.Println(currCuboid)
+			// fmt.Println(line)
+			// fmt.Println(currCuboid.Volume())
 
-			for x := xS; x <= xE; x++ {
+			/* for x := xS; x <= xE; x++ {
 				for y := yS; y <= yE; y++ {
 					for z := zS; z <= zE; z++ {
 						fmt.Printf("%d,%d,%d\n", x, y, z)
@@ -73,42 +72,61 @@ func Reboot(input []string, bounds float64) int {
 
 					}
 				}
-			}
+			} */
 		} else {
 			panic("parsing error")
 		}
 	}
 
-	for _, c1 := range cuboids {
+	// fmt.Println(" ")
+	/* for i, c := range cuboids {
+	// fmt.Println(c)
+	if i == 0 {
+		reactor[c] = c.on
+		continue
+	}
+	for j := 0; j < i; j++ {
+		// checking if existing cuboids overlap with current one
+		fmt.Println(isOverlap(c, cuboids[j]))
+		if isOverlap(c, cuboids[j]) {
+			Split(c, cuboids[j])
+		}
+
+	} */
+	// fmt.Printf("There are currently %d 1x1x1 squares on\n", countOnCuboid(reactor))
+
+	/* for _, c1 := range cuboids {
 		for _, c2 := range cuboids {
 			if isOverlap(c1, c2) {
 				// fmt.Println(c1, c2)
 			}
 		}
-	}
+	} */
 
 	//try and split first two cuboids
 	fmt.Println(cuboids)
 	c1, c2 := cuboids.PopLeft(), cuboids.PopLeft()
 	fmt.Println(c1, c2)
 	fmt.Println(isOverlap(c1, c2))
-	if c1StartInC2(c1, c2) {
-		fmt.Println("c1 start in c2")
-	} else if c2StartInC1(c1, c2) {
-		fmt.Println("c2 start in c1")
-		nc1 := cuboid{c1.start, c2.start, c1.on}
-		nc2 := cuboid{c2.start, c1.end, false}
-		nc3 := cuboid{c1.end, c2.end, false}
-		fmt.Println(nc1, nc2, nc3)
-	} else {
-	}
-	return countOn(reactor)
+	Split(c1, c2)
+	return countOnCuboid(reactor)
 }
 
 func countOn(r map[point]bool) (on int) {
 	for _, o := range r {
 		if o == true {
 			on++
+		}
+	}
+	return
+}
+
+// countOnCuboid counts the number of 1 x 1 x 1 cubes that are switched on in the reactor map.
+// It assumes that there are no overlapping cuboids, and such overlaps would be handled before insertion into reactor map
+func countOnCuboid(r map[cuboid]bool) (on int) {
+	for c, o := range r {
+		if o {
+			on += c.Volume()
 		}
 	}
 	return
@@ -127,5 +145,24 @@ func intInRange(s string, r float64, start bool) int {
 }
 
 // when two cuboids overlap, they can be split into four distinct cuboids and treated separately
-// func Split(c1, c2 cuboid) (nc1, nc2, nc3, nc4 cuboid) {
-// }
+func Split(c1, c2 cuboid) []cuboid {
+	if c1StartInC2(c1, c2) {
+		return split(c2, c1)
+	} else if c2StartInC1(c1, c2) {
+		return split(c1, c2)
+	} else {
+		return make([]cuboid, 0)
+	}
+}
+
+func split(a, b cuboid) []cuboid {
+	res := make([]cuboid, 0)
+	fmt.Println(a, b)
+	nc := cuboid{a.start, b.start, true}
+	nc2 := cuboid{a.end, b.end, true}
+	nc3 := cuboid{b.start, a.end, true}
+	nc4 := cuboid{}
+	res = append(res, nc, nc2, nc3)
+	fmt.Println(res)
+	return res
+}
