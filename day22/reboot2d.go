@@ -1,5 +1,6 @@
-package main
+package day22
 
+/*
 import "fmt"
 
 type point struct {
@@ -31,4 +32,4 @@ func split(r1, r2 rectangle) []rectangle {
 	nr5 := rectangle{point{r1.end.x, r2.start.y}, r2.end}
 	res = append(res, nr1, nr2, nr3, nr4, nr5)
 	return res
-}
+} */

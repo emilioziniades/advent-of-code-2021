@@ -60,53 +60,37 @@ func Reboot(input []string, bounds float64) int {
 
 			currCuboid := newCuboid(point{xS, yS, zS}, point{xE, yE, zE}, on)
 			cuboids.Push(currCuboid)
-			// fmt.Println(currCuboid)
-			// fmt.Println(line)
-			// fmt.Println(currCuboid.Volume())
-
-			/* for x := xS; x <= xE; x++ {
-				for y := yS; y <= yE; y++ {
-					for z := zS; z <= zE; z++ {
-						fmt.Printf("%d,%d,%d\n", x, y, z)
-						reactor[point{x, y, z}] = on
-
-					}
-				}
-			} */
 		} else {
 			panic("parsing error")
 		}
 	}
 
-	// fmt.Println(" ")
-	/* for i, c := range cuboids {
-	// fmt.Println(c)
-	if i == 0 {
-		reactor[c] = c.on
-		continue
+	// add
+	for i, c := range cuboids {
+		if i == 0 {
+			reactor[c] = c.on
+			continue
+		}
 	}
-	for j := 0; j < i; j++ {
+	/* for j := 0; j < i; j++ {
 		// checking if existing cuboids overlap with current one
 		fmt.Println(isOverlap(c, cuboids[j]))
 		if isOverlap(c, cuboids[j]) {
 			Split(c, cuboids[j])
 		}
 
-	} */
-	// fmt.Printf("There are currently %d 1x1x1 squares on\n", countOnCuboid(reactor))
+	}
+	fmt.Printf("There are currently %d 1x1x1 squares on\n", countOnCuboid(reactor))
 
-	/* for _, c1 := range cuboids {
+	for _, c1 := range cuboids {
 		for _, c2 := range cuboids {
 			if isOverlap(c1, c2) {
 				// fmt.Println(c1, c2)
-			}
-		}
-	} */
+			} */
 
 	//try and split first two cuboids
 	fmt.Println(cuboids)
 	c1, c2 := cuboids.PopLeft(), cuboids.PopLeft()
-	fmt.Println(c1, c2)
 	fmt.Println(isOverlap(c1, c2))
 	Split(c1, c2)
 	return countOnCuboid(reactor)
@@ -147,22 +131,47 @@ func intInRange(s string, r float64, start bool) int {
 // when two cuboids overlap, they can be split into four distinct cuboids and treated separately
 func Split(c1, c2 cuboid) []cuboid {
 	if c1StartInC2(c1, c2) {
-		return split(c2, c1)
+		return split(c2, c1, true)
 	} else if c2StartInC1(c1, c2) {
-		return split(c1, c2)
+		return split(c1, c2, false)
 	} else {
 		return make([]cuboid, 0)
 	}
 }
 
-func split(a, b cuboid) []cuboid {
+// for now, assuming that one cuboid does not contain the other cuboid
+func split(a, b cuboid, inverted bool) []cuboid {
 	res := make([]cuboid, 0)
-	fmt.Println(a, b)
-	nc := cuboid{a.start, b.start, true}
-	nc2 := cuboid{a.end, b.end, true}
-	nc3 := cuboid{b.start, a.end, true}
-	nc4 := cuboid{}
-	res = append(res, nc, nc2, nc3)
+	fmt.Println(a, a.Volume())
+	fmt.Println(b, b.Volume())
+	// two chunks on either side with no overlap
+	nc1 := cuboid{point{a.start.x, a.start.y, a.start.z}, point{b.start.x - 1, a.end.y, a.end.z}, a.on}
+	nc2 := cuboid{point{a.end.x, b.start.y, b.start.z}, point{b.end.x - 1, b.end.y, b.end.z}, b.on}
+
+	// overlapping section
+	overlapOn := false
+	if inverted {
+		overlapOn = a.on
+	} else {
+		overlapOn = b.on
+	}
+	nc3 := cuboid{b.start, a.end, overlapOn}
+
+	// four remaining chunks left, below, above and right of the overlapping section
+	nc4 := cuboid{point{b.start.x, a.start.y, a.start.z}, point{a.end.x - 1, b.start.y, a.end.z}, a.on}
+	nc5 := cuboid{point{b.start.x, b.start.y, a.start.z}, point{a.end.x - 1, a.end.y, b.start.z}, a.on}
+	nc6 := cuboid{point{b.start.x, b.start.y, a.end.z}, point{a.end.x - 1, a.end.y, b.end.z}, b.on}
+	nc7 := cuboid{point{b.start.x, a.end.y, b.start.z}, point{a.end.x - 1, b.end.y, b.end.z}, b.on}
+
+	res = append(res, nc1, nc2, nc3, nc4, nc5, nc6, nc7)
+	// RenderCuboids(res)
+
+	sum := 0
+	for _, c := range res {
+		fmt.Println(c, c.Volume())
+		sum += c.Volume()
+	}
+	fmt.Println(sum)
 	fmt.Println(res)
 	return res
 }
