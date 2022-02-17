@@ -41,3 +41,32 @@ func TestReboot(t *testing.T) {
 		}
 	}
 }
+
+func TestSplit(t *testing.T) {
+	var tests = []struct {
+		c1, c2 day22.Cuboid
+		want   int
+	}{
+		{day22.Cuboid{day22.Point{10, 10, 10}, day22.Point{12, 12, 12}, true}, day22.Cuboid{day22.Point{11, 11, 11}, day22.Point{13, 13, 13}, true}, 46},
+		{day22.Cuboid{day22.Point{11, 11, 11}, day22.Point{13, 13, 13}, true}, day22.Cuboid{day22.Point{10, 10, 10}, day22.Point{12, 12, 12}, true}, 46},
+		{day22.Cuboid{day22.Point{10, 10, 10}, day22.Point{13, 13, 13}, true}, day22.Cuboid{day22.Point{12, 12, 12}, day22.Point{15, 15, 15}, true}, 120},
+		{day22.Cuboid{day22.Point{9, 9, 9}, day22.Point{11, 11, 11}, true}, day22.Cuboid{day22.Point{10, 10, 10}, day22.Point{10, 12, 12}, true}, 32},
+		{day22.Cuboid{day22.Point{11, 9, 9}, day22.Point{11, 11, 11}, true}, day22.Cuboid{day22.Point{11, 10, 10}, day22.Point{12, 10, 12}, true}, 13},
+	}
+	for _, tt := range tests {
+		children := day22.Split(tt.c1, tt.c2)
+		count := 0
+		for _, c := range children {
+			if c.Volume() < 0 {
+				continue
+			}
+			count += c.Volume()
+		}
+		format := "wanted %d, got %d, for day22.Cuboids %v and %v"
+		if count != tt.want {
+			t.Fatalf(format, tt.want, count, tt.c1, tt.c2)
+		} else {
+			t.Logf(format, tt.want, count, tt.c1, tt.c2)
+		}
+	}
+}
