@@ -46,32 +46,96 @@ func TestSplit(t *testing.T) {
 	var tests = []struct {
 		c1, c2 Cuboid
 		want   int
+		title  string
 	}{
-		{Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true}, Cuboid{Point{11, 11, 11}, Point{13, 13, 13}, true}, 46},
-		{Cuboid{Point{11, 11, 11}, Point{13, 13, 13}, true}, Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true}, 46},
-		{Cuboid{Point{10, 10, 10}, Point{13, 13, 13}, true}, Cuboid{Point{12, 12, 12}, Point{15, 15, 15}, true}, 120},
-		{Cuboid{Point{9, 9, 9}, Point{11, 11, 11}, true}, Cuboid{Point{10, 10, 10}, Point{10, 12, 12}, true}, 32},
-		{Cuboid{Point{11, 9, 9}, Point{11, 11, 11}, true}, Cuboid{Point{11, 10, 10}, Point{12, 10, 12}, true}, 13},
+		{
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			Cuboid{Point{11, 11, 11}, Point{13, 13, 13}, true},
+			46,
+			"A. s1.e.x < s2.e.y & s1.e.y < s2.e.y & s1.e.z < s2.e.z",
+		},
+		{
+			Cuboid{Point{11, 11, 11}, Point{13, 13, 13}, true},
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			46,
+			"A reversed. s1.s.x > s2.s.y & s1.s.y > s2.s.y & s1.s.z > s2.s.z ",
+		},
+		{
+			Cuboid{Point{10, 10, 10}, Point{13, 13, 13}, true},
+			Cuboid{Point{12, 12, 12}, Point{15, 15, 15}, true},
+			120,
+			"",
+		},
+		/* {
+			Cuboid{Point{12, 12, 12}, Point{15, 15, 15}, true},
+			Cuboid{Point{10, 10, 10}, Point{13, 13, 13}, true},
+			120,
+		}, */
+		{
+			Cuboid{Point{9, 9, 9}, Point{11, 11, 11}, true},
+			Cuboid{Point{10, 10, 10}, Point{10, 12, 12}, true},
+			32,
+			"C. s2.end.y > s1.end.y and s1.end.z < s2.end.z",
+		},
+		{
+			Cuboid{Point{11, 9, 9}, Point{11, 11, 11}, true},
+			Cuboid{Point{11, 10, 10}, Point{12, 10, 12}, true},
+			13,
+			"C reversed",
+		},
+		{
+			Cuboid{Point{11, 10, 10}, Point{12, 10, 12}, true},
+			Cuboid{Point{11, 9, 9}, Point{11, 11, 11}, true},
+			13,
+			"Funny shape",
+		},
+		{
+			Cuboid{Point{10, 10, 10}, Point{10, 10, 10}, true},
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			27,
+			"E. wholly contained, but shared starting x, y and z",
+		},
+		{
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			Cuboid{Point{10, 10, 10}, Point{10, 10, 10}, true},
+			27,
+			"E reversed.",
+		},
+		{
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			Cuboid{Point{11, 11, 11}, Point{13, 13, 11}, true},
+			30,
+			"F. end x and end y",
+		},
+		{
+			Cuboid{Point{11, 11, 11}, Point{13, 13, 11}, true},
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			30,
+			"F reversed",
+		},
 	}
 	for _, tt := range tests {
 		children := Split(tt.c1, tt.c2)
 		count := 0
 		for _, c := range children {
-			if c.Volume() < 0 {
-				continue
-			}
 			count += c.Volume()
 		}
-		format := "wanted %d, got %d, for Cuboids %v and %v"
+		// fmt.Println(children)
+		format := "wanted %d, got %d, for Cuboids %v and %v (%s)"
 		if count != tt.want {
-			t.Fatalf(format, tt.want, count, tt.c1, tt.c2)
+			t.Errorf(format, tt.want, count, tt.c1, tt.c2, tt.title)
 		} else {
-			t.Logf(format, tt.want, count, tt.c1, tt.c2)
+			t.Logf(format, tt.want, count, tt.c1, tt.c2, tt.title)
 		}
 	}
 }
 
-func TestSplit1D(t *testing.T) {
+func Test1DAnd2d(t *testing.T) {
+	test1DSplit(t)
+	test2DSplit(t)
+}
+
+func test1DSplit(t *testing.T) {
 	var tests = []struct {
 		a, b  Segment
 		want  []Segment
@@ -102,7 +166,7 @@ func TestSplit1D(t *testing.T) {
 	}
 }
 
-func TestSplit2D(t *testing.T) {
+func test2DSplit(t *testing.T) {
 
 	var tests = []struct {
 		a, b  Square

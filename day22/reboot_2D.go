@@ -12,18 +12,6 @@ type Square struct {
 	start, end point2
 }
 
-type toggler struct {
-	toggleVal int
-}
-
-func newToggler(x1, x2 int) toggler {
-	return toggler{toggleVal: x1 ^ x2}
-}
-
-func (t toggler) toggle(x int) int {
-	return t.toggleVal ^ x
-}
-
 func Split2D(s1, s2 Square) (children []Square) {
 
 	xS := []int{s1.start.x, s1.end.x, s2.start.x, s2.end.x}
