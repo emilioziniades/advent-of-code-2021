@@ -2,6 +2,7 @@ package day22
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 	"testing"
 
@@ -22,12 +23,12 @@ func TestReboot(t *testing.T) {
 		want  int
 		limit int
 	}{
-		// {"22.me", 4, 50},
-		// {"22.si", 39, 50},
+		{"22.si", 39, 50},
 		{"22.ex", 590784, 50},
-		// {"22.ex2", 474140, 50},
-		// {"22.in", 553201, 50},
-		// {"22.ex2", 474140, math.MaxInt},
+		{"22.ex2", 474140, 50},
+		{"22.in", 553201, 50},
+		{"22.ex2", 2758514936282235, math.MaxInt},
+		{"22.in", 1263946820845866, math.MaxInt},
 	}
 	for _, tt := range tests {
 		in, err := parse.FileToStringSlice(tt.file)

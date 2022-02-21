@@ -1,54 +1,12 @@
 package day22
 
 import (
-	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 
 	"github.com/emilioziniades/adventofcode2021/stack"
 )
-
-func isOverlap(a, b Cuboid) bool {
-	//does one cube have a start or end Point that lies within the other cube?
-	return isAStartInB(a, b) || isAStartInB(b, a)
-}
-
-func isAStartInB(a, b Cuboid) bool {
-	return (a.start.x >= b.start.x && a.start.x <= b.end.x) && (a.start.y >= b.start.y && a.start.y <= b.end.y) && (a.start.z >= b.start.z && a.start.z <= b.end.z)
-
-}
-
-func isAEndInB(a, b Cuboid) bool {
-	return (a.end.x >= b.start.x && a.end.x <= b.end.x) && (a.end.y >= b.start.y && a.end.y <= b.end.y) && (a.end.z >= b.start.z && a.end.z <= b.end.z)
-}
-
-// countOn counts the number of unit cubes that are on in the reactor map. It assumes that there are no overlapping cuboids, and such overlaps would be handled before insertion into reactor map
-func countOn(r map[Cuboid]bool) (on int) {
-	for c, o := range r {
-		// fmt.Println(c, c.Volume(), o)
-		if o {
-			on += c.Volume()
-		}
-	}
-	return
-}
-
-func printPoints(c Cuboid) {
-	for x := c.start.x; x <= c.end.x; x++ {
-		for y := c.start.y; y <= c.end.y; y++ {
-			for z := c.start.z; z <= c.end.z; z++ {
-				fmt.Printf("%d,%d,%d\n", x, y, z)
-			}
-		}
-	}
-}
-
-func printAllPoints(r map[Cuboid]bool) {
-	for k := range r {
-		printPoints(k)
-	}
-}
 
 func inputToCuboids(input []string, bounds int) stack.Stack[Cuboid] {
 	cuboids := stack.New[Cuboid]()
@@ -62,8 +20,6 @@ func inputToCuboids(input []string, bounds int) stack.Stack[Cuboid] {
 				on = true
 			}
 
-			fmt.Println(line)
-
 			xS, xE := toInt(match[2]), toInt(match[3])
 			yS, yE := toInt(match[4]), toInt(match[5])
 			zS, zE := toInt(match[6]), toInt(match[7])
@@ -71,7 +27,6 @@ func inputToCuboids(input []string, bounds int) stack.Stack[Cuboid] {
 			currCuboid := NewCuboid(xS, yS, zS, xE, yE, zE, on)
 
 			if isOverlap(*boundary, *currCuboid) {
-
 				cuboids.Push(boundCuboid(*currCuboid, bounds))
 			}
 
@@ -80,6 +35,13 @@ func inputToCuboids(input []string, bounds int) stack.Stack[Cuboid] {
 		}
 	}
 	return cuboids
+}
+
+func boundCuboid(c Cuboid, bounds int) Cuboid {
+	xS, xE := intInRange(c.start.x, bounds, true), intInRange(c.end.x, bounds, false)
+	yS, yE := intInRange(c.start.y, bounds, true), intInRange(c.end.y, bounds, false)
+	zS, zE := intInRange(c.start.z, bounds, true), intInRange(c.end.z, bounds, false)
+	return *NewCuboid(xS, yS, zS, xE, yE, zE, c.on)
 }
 
 func intInRange(n int, b int, start bool) int {
@@ -100,9 +62,27 @@ func toInt(s string) (i int) {
 	return
 }
 
-func boundCuboid(c Cuboid, bounds int) Cuboid {
-	xS, xE := intInRange(c.start.x, bounds, true), intInRange(c.end.x, bounds, false)
-	yS, yE := intInRange(c.start.y, bounds, true), intInRange(c.end.y, bounds, false)
-	zS, zE := intInRange(c.start.z, bounds, true), intInRange(c.end.z, bounds, false)
-	return *NewCuboid(xS, yS, zS, xE, yE, zE, c.on)
+func isOverlap(a, b Cuboid) bool {
+	// do a and b overlap in all three axex
+	return xAxisOverlap(a, b) && yAxisOverlap(a, b) && zAxisOverlap(a, b)
+}
+
+func xAxisOverlap(a, b Cuboid) bool {
+	return a.end.x >= b.start.x && a.start.x <= b.end.x
+}
+func yAxisOverlap(a, b Cuboid) bool {
+	return a.end.y >= b.start.y && a.start.y <= b.end.y
+}
+func zAxisOverlap(a, b Cuboid) bool {
+	return a.end.z >= b.start.z && a.start.z <= b.end.z
+}
+
+// countOn counts the number of unit cubes that are on in the reactor map. It assumes that there are no overlapping cuboids, and such overlaps would be handled before insertion into reactor map
+func countOn(r map[Cuboid]bool) (on int) {
+	for c, o := range r {
+		if o {
+			on += c.Volume()
+		}
+	}
+	return
 }

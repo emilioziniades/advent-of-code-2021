@@ -1,7 +1,6 @@
 package day22
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -23,51 +22,36 @@ func Reboot(input []string, bounds int) int {
 						Recursively do the above procedure
 
 	*/
-	depth := 0
+
 	var recReboot func(Cuboid)
 	recReboot = func(c Cuboid) {
-		fmt.Printf("%*schecking Cuboid %v\n", depth*2, "", c)
 		for r := range reactor {
 			//check for overlap
 			if isOverlap(c, r) {
-				fmt.Printf("%*sfound overlap between %v and %v\n", depth*2, "", c, r)
 				children := Split(r, c)
-				// fmt.Println(children)
 				//delete overlapping Cuboid since its children will replace it
 				delete(reactor, r)
 				for _, child := range children {
-					depth++
 					recReboot(child)
-					depth--
 				}
 				return
 			}
 		}
 		// if got here, no overlap, add to reactor
-		fmt.Printf("%*sinserting Cuboid %v into reactor\n", depth*2, "", c)
-		if c.on {
-			reactor[c] = c.on
-		}
+		reactor[c] = c.on
 	}
 
 	for len(cuboids) > 0 {
 		// pop next Cuboid
 		curr := cuboids.PopLeft()
-		fmt.Printf("********* next instruction: %v *********\n", curr)
-		depth++
 		recReboot(curr)
-		depth--
-		fmt.Printf("********* current unit cubes count: %d *********\n", countOn(reactor))
-		// fmt.Println("********* reactor status *********")
-		// pp.Println(reactor)
-		// printAllPoints(reactor)
-		// fmt.Println("***************************")
 	}
 	return countOn(reactor)
 }
 
 // when two cuboids overlap, they can be split into seven distinct cuboids and treated separately
 func Split(s1, s2 Cuboid) (children []Cuboid) {
+
 	/*
 		This is looking with positive x right, positive y away, and positive z up
 
@@ -96,8 +80,6 @@ func Split(s1, s2 Cuboid) (children []Cuboid) {
 
 	var c1, c2, c3, c4, c5, c6, c7 *Cuboid
 	res := make([]*Cuboid, 0)
-
-	//TODO determine if children cuboids are on or off
 
 	// default state is s1 wholly contains s2 on all sides
 	// c4 will always be present, but other six cuboids depend on other factors
