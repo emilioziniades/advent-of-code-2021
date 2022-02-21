@@ -1,6 +1,7 @@
 package day22
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -14,14 +15,16 @@ func init() {
 		panic(err)
 	}
 }
+
 func TestReboot(t *testing.T) {
 	var tests = []struct {
 		file  string
 		want  int
-		limit float64
+		limit int
 	}{
-		{"22.si", 39, 50},
-		// {"22.ex", 590784, 50},
+		// {"22.me", 4, 50},
+		// {"22.si", 39, 50},
+		{"22.ex", 590784, 50},
 		// {"22.ex2", 474140, 50},
 		// {"22.in", 553201, 50},
 		// {"22.ex2", 474140, math.MaxInt},
@@ -50,6 +53,18 @@ func TestSplit(t *testing.T) {
 	}{
 		{
 			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			Cuboid{Point{10, 10, 10}, Point{10, 10, 10}, false},
+			46,
+			"testing on/off",
+		},
+		{
+			Cuboid{Point{10, 10, 10}, Point{10, 10, 10}, false},
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
+			46,
+			"testing on/off in reverse",
+		},
+		{
+			Cuboid{Point{10, 10, 10}, Point{12, 12, 12}, true},
 			Cuboid{Point{11, 11, 11}, Point{13, 13, 13}, true},
 			46,
 			"A. s1.e.x < s2.e.y & s1.e.y < s2.e.y & s1.e.z < s2.e.z",
@@ -66,11 +81,12 @@ func TestSplit(t *testing.T) {
 			120,
 			"",
 		},
-		/* {
+		{
 			Cuboid{Point{12, 12, 12}, Point{15, 15, 15}, true},
 			Cuboid{Point{10, 10, 10}, Point{13, 13, 13}, true},
 			120,
-		}, */
+			"",
+		},
 		{
 			Cuboid{Point{9, 9, 9}, Point{11, 11, 11}, true},
 			Cuboid{Point{10, 10, 10}, Point{10, 12, 12}, true},
@@ -120,7 +136,7 @@ func TestSplit(t *testing.T) {
 		for _, c := range children {
 			count += c.Volume()
 		}
-		// fmt.Println(children)
+		fmt.Println(children)
 		format := "wanted %d, got %d, for Cuboids %v and %v (%s)"
 		if count != tt.want {
 			t.Errorf(format, tt.want, count, tt.c1, tt.c2, tt.title)
@@ -130,7 +146,7 @@ func TestSplit(t *testing.T) {
 	}
 }
 
-func Test1DAnd2d(t *testing.T) {
+func Test1DAnd2D(t *testing.T) {
 	test1DSplit(t)
 	test2DSplit(t)
 }
