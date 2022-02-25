@@ -13,6 +13,13 @@ func Reverse[T any](t []T) {
 	}
 }
 
+func Range(start, end, increment int) (slice []int) {
+	for i := start; i < end; i += increment {
+		slice = append(slice, i)
+	}
+	return
+}
+
 func Map[T any](t []T, f func(T) T) []T {
 	res := make([]T, 0)
 	for _, e := range t {

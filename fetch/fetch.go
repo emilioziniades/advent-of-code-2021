@@ -53,10 +53,13 @@ func makeReq(url string) (*http.Response, error) {
 	}
 	cookie := &http.Cookie{
 		Name:  "session",
-		Value: "53616c7465645f5f49d023b421540c68d1577580b91b6a5b67ee24bfb9c0758058e790d46fdd5443418f40eaf420f711",
+		Value: os.Getenv("AOC_COOKIE"),
 	}
 	req.AddCookie(cookie)
 	resp, err := client.Do(req)
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Data: request failed with status code %d", resp.StatusCode)
+	}
 	if err != nil {
 		return nil, err
 	}
