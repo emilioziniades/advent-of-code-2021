@@ -81,7 +81,7 @@ func CountBeaconsAndScannerDistance(input []string) (int, int) {
 
 	determineSharedBeacons(scanners, adjacency)
 
-	for k, _ := range scanners {
+	for k := range scanners {
 		reorientBeaconsToZero(scanners, k, adjacency)
 		reorientScannersToZero(scanners, k, adjacency)
 	}
