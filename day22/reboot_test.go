@@ -1,7 +1,6 @@
 package day22
 
 import (
-	"fmt"
 	"math"
 	"reflect"
 	"testing"
@@ -46,7 +45,7 @@ func TestReboot(t *testing.T) {
 	}
 }
 
-func TestSplit(t *testing.T) {
+func testSplit(t *testing.T) {
 	var tests = []struct {
 		c1, c2 Cuboid
 		want   int
@@ -137,7 +136,6 @@ func TestSplit(t *testing.T) {
 		for _, c := range children {
 			count += c.Volume()
 		}
-		fmt.Println(children)
 		format := "wanted %d, got %d, for Cuboids %v and %v (%s)"
 		if count != tt.want {
 			t.Errorf(format, tt.want, count, tt.c1, tt.c2, tt.title)
@@ -147,7 +145,7 @@ func TestSplit(t *testing.T) {
 	}
 }
 
-func Test1DAnd2D(t *testing.T) {
+func test1DAnd2D(t *testing.T) {
 	test1DSplit(t)
 	test2DSplit(t)
 }
