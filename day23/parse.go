@@ -49,7 +49,7 @@ func (s State) Contains(p Pod) bool {
 	return false
 }
 
-func ParseInitialState(file string) State {
+func ParseState(file string) State {
 
 	state := State{}
 

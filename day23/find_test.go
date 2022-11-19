@@ -1,6 +1,7 @@
 package day23_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -185,7 +186,7 @@ func TestIsHome(t *testing.T) {
 }
 
 func TestHomeButMustMakeSpace(t *testing.T) {
-	state := day23.ParseInitialState("example.txt")
+	state := day23.ParseState("example.txt")
 	tests := []struct {
 		pod      day23.Pod
 		expected bool
@@ -231,8 +232,8 @@ func TestHomeButMustMakeSpace(t *testing.T) {
 	}
 }
 
-func TestPodNextPositionsAndCosts(t *testing.T) {
-	state := day23.ParseInitialState("example.txt")
+func TestPodNextPositionsAndCostsInitialState(t *testing.T) {
+	state := day23.ParseState("example.txt")
 	tests := []struct {
 		pod      day23.Pod
 		expected map[day23.Pod]int
@@ -306,6 +307,35 @@ func TestPodNextPositionsAndCosts(t *testing.T) {
 
 }
 
-func TestDjikstra(t *testing.T) {
+func TestPodNextPositionsAndCosts(t *testing.T) {
+	state := day23.ParseState("example2.txt")
+	tests := []struct {
+		pod      day23.Pod
+		expected map[day23.Pod]int
+	}{
+		// only place it can go is home
+		{
+			day23.Pod{
+				day23.Point{2, 5},
+				"C",
+			},
+			map[day23.Pod]int{
+				{day23.Point{2, 7}, "C"}: 400,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		got := day23.GetPodNextPositionsAndCosts(tt.pod, state)
+		if !reflect.DeepEqual(got, tt.expected) {
+			t.Errorf("All next positions not found for pod %#v", tt.pod)
+			pp.Println(got)
+			fmt.Println()
+			pp.Println(tt.expected)
+		}
+	}
+
+}
+func testDjikstra(t *testing.T) {
 	day23.Djikstra("example.txt")
 }

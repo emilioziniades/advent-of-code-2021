@@ -61,7 +61,7 @@ var (
 )
 
 func Djikstra(file string) {
-	startState := ParseInitialState(file)
+	startState := ParseState(file)
 
 	frontier := queue.NewPriority[State]()
 	frontier.Enqueue(startState, 0)
@@ -96,10 +96,7 @@ func Djikstra(file string) {
 				cameFrom[next] = current
 			}
 		}
-
 	}
-
-	// pp.Println(costSoFar)
 
 }
 
@@ -126,6 +123,7 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 	if !state.Contains(pod) {
 		panic("current pod not in existing state")
 	}
+
 	nextPositions := make(map[Pod]int, 0)
 	homePosition := homePositions[pod.Type]
 
@@ -266,11 +264,7 @@ func (pod Pod) HomeButMustMakeSpace(state State) bool {
 }
 
 func (p Pod) IsHome() bool {
-	if p.InHallway() {
-		// in hallway
-		return false
-	}
-	if p.Pt.Col == homeColumn[p.Type] {
+	if !p.InHallway() && p.Pt.Col == homeColumn[p.Type] {
 		// not in hallway, and in home column => home
 		return true
 	}
