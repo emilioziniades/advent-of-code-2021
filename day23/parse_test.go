@@ -15,33 +15,6 @@ func TestParseInitialState(t *testing.T) {
 	}{
 		{
 			/*
-			   #####
-			   ##.##
-			   #.A.#
-			   ##.##
-			   #####
-			*/
-			"simplest.txt",
-			day23.State{
-				day23.Point{2, 2}: 'A',
-			},
-		},
-		{
-			/*
-				#########
-				#.......#
-				###.#.###
-				  #B#A#
-				  #####
-			*/
-			"simple.txt",
-			day23.State{
-				day23.Point{3, 3}: 'B',
-				day23.Point{3, 5}: 'A',
-			},
-		},
-		{
-			/*
 				#############
 				#...........#
 				###B#C#B#D###
@@ -50,14 +23,14 @@ func TestParseInitialState(t *testing.T) {
 			*/
 			"example.txt",
 			day23.State{
-				day23.Point{2, 3}: 'B',
-				day23.Point{3, 3}: 'A',
-				day23.Point{2, 5}: 'C',
-				day23.Point{3, 5}: 'D',
-				day23.Point{2, 7}: 'B',
-				day23.Point{3, 7}: 'C',
-				day23.Point{2, 9}: 'D',
-				day23.Point{3, 9}: 'A',
+				{day23.Point{2, 3}, "B"},
+				{day23.Point{2, 5}, "C"},
+				{day23.Point{2, 7}, "B"},
+				{day23.Point{2, 9}, "D"},
+				{day23.Point{3, 3}, "A"},
+				{day23.Point{3, 5}, "D"},
+				{day23.Point{3, 7}, "C"},
+				{day23.Point{3, 9}, "A"},
 			},
 		},
 	}
