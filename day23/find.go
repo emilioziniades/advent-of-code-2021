@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	maxRows      = 12
+	maxRows = 12
+
 	hallRow      = 1
 	upperHomeRow = 2 // row closer to hall
 	lowerHomeRow = 3 // row furthest from hall
@@ -140,6 +141,7 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 
 		// which direction should it go?
 		goLeft := homePosition[0].Col < pod.Pt.Col
+
 		var delta int
 		if goLeft {
 			delta = -1
