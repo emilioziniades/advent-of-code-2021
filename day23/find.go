@@ -2,22 +2,17 @@ package day23
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/emilioziniades/adventofcode2021/queue"
 )
 
 const (
-	maxRows = 12
+	debug = false
 
 	hallRow      = 1
 	upperHomeRow = 2 // row closer to hall
 	lowerHomeRow = 3 // row furthest from hall
 
-	AHomeCol     = 3
-	BHomeCol     = 5
-	CHomeCol     = 7
-	DHomeCol     = 9
 	hallStartCol = 1
 	hallEndCol   = 11
 )
@@ -45,49 +40,53 @@ var (
 	}
 
 	endState = State{
-		{Point{upperHomeRow, AHomeCol}, "A"},
-		{Point{upperHomeRow, BHomeCol}, "B"},
-		{Point{upperHomeRow, CHomeCol}, "C"},
-		{Point{upperHomeRow, DHomeCol}, "D"},
-		{Point{lowerHomeRow, AHomeCol}, "A"},
-		{Point{lowerHomeRow, BHomeCol}, "B"},
-		{Point{lowerHomeRow, CHomeCol}, "C"},
-		{Point{lowerHomeRow, DHomeCol}, "D"},
+		{Point{upperHomeRow, homeColumn["A"]}, "A"},
+		{Point{upperHomeRow, homeColumn["B"]}, "B"},
+		{Point{upperHomeRow, homeColumn["C"]}, "C"},
+		{Point{upperHomeRow, homeColumn["D"]}, "D"},
+		{Point{lowerHomeRow, homeColumn["A"]}, "A"},
+		{Point{lowerHomeRow, homeColumn["B"]}, "B"},
+		{Point{lowerHomeRow, homeColumn["C"]}, "C"},
+		{Point{lowerHomeRow, homeColumn["D"]}, "D"},
 	}
-
-	nilState = State{}
-	nilPod   = Pod{}
-	nilPoint = Point{}
 )
 
-func Djikstra(file string) {
+func Djikstra(file string) int {
 	startState := ParseState(file)
 
 	frontier := queue.NewPriority[State]()
 	frontier.Enqueue(startState, 0)
 	cameFrom := make(map[State]State)
 	costSoFar := make(map[State]int)
-	cameFrom[startState] = nilState
+	cameFrom[startState] = State{}
 	costSoFar[startState] = 0
 
 	for len(frontier) != 0 {
 
 		current := frontier.Dequeue().Value
-		fmt.Println("CURRENT: ")
-		fmt.Println()
-		PrintState(current)
-		fmt.Println()
+		if debug {
+			fmt.Println("CURRENT: ")
+			fmt.Println()
+			PrintState(current)
+			fmt.Println()
+		}
 
 		if current == endState {
-			fmt.Println("found end state!")
+			if debug {
+				fmt.Println("found end state!")
+				PrintPath(startState, cameFrom)
+			}
 			break
 		}
 
-		fmt.Println("NEXT: ")
-		fmt.Println()
-		for next, cost := range getStateNeighbours(current) {
-			PrintState(next)
+		if debug {
+			fmt.Println("NEXT: ")
 			fmt.Println()
+		}
+		for next, cost := range getStateNeighbours(current) {
+			if debug {
+				PrintState(next)
+			}
 			newCost := costSoFar[current] + cost
 
 			if cost, ok := costSoFar[next]; !ok || newCost < cost {
@@ -98,6 +97,27 @@ func Djikstra(file string) {
 		}
 	}
 
+	return costSoFar[endState]
+
+}
+
+func PrintPath(startState State, cameFrom map[State]State) {
+	current := endState
+	path := make([]State, 0)
+	for current != startState {
+		path = append(path, current)
+		current = cameFrom[current]
+	}
+	path = append(path, startState)
+
+	for i := len(path) - 1; i >= 0; i-- {
+		fmt.Println()
+		fmt.Println("STEP ", len(path)-i)
+		fmt.Println()
+		PrintState(path[i])
+		fmt.Println()
+	}
+
 }
 
 func getStateNeighbours(currentState State) map[State]int {
@@ -106,11 +126,10 @@ func getStateNeighbours(currentState State) map[State]int {
 	// next possible states are all the possible ways each amphipod can move
 	for i, pod := range currentState {
 		// get all possible next positions for this pod, and add those to state neighbours
-		nextPodPositions := GetPodNextPositionsAndCosts(pod, currentState)
-		for nextPodPosition, cost := range nextPodPositions {
+		for nextPodPosition, cost := range GetPodNextPositionsAndCosts(pod, currentState) {
 			nextState := currentState
 			nextState[i] = nextPodPosition
-			sort.Sort(nextState)
+			SortState(nextState[:])
 			stateNeighbours[nextState] = cost
 		}
 	}
@@ -125,7 +144,6 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 	}
 
 	nextPositions := make(map[Pod]int, 0)
-	homePosition := homePositions[pod.Type]
 
 	if pod.IsHome() && !pod.HomeButMustMakeSpace(state) {
 		// home already, nowhere to go
@@ -134,45 +152,12 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 
 	if pod.InHallway() {
 		// only place it can go is home
-
-		// can it reach home?
-
-		// which direction should it go?
-		goLeft := homePosition[0].Col < pod.Pt.Col
-
-		var delta int
-		if goLeft {
-			delta = -1
-		} else {
-			delta = 1
+		homePos, homeCost, canReachHome := RouteHome(pod, state)
+		if canReachHome {
+			nextPositions[homePos] = homeCost
 		}
+		return nextPositions
 
-		// can it get home?
-		targetCol := homePosition[0].Col
-		for i := pod.Pt.Col; i != targetCol; i += delta {
-			// move in direction of home
-			currentPosition := Point{hallRow, i}
-			if _, blocked := state.PodAt(currentPosition); blocked {
-				// blocked, can't get home
-				return nextPositions
-
-			}
-		}
-
-		// it can get home!
-
-		// try lower slot, then upper slot
-		if _, hasPod := state.PodAt(homePosition[1]); !hasPod {
-			// lower position free
-			nextPositions[Pod{homePosition[1], pod.Type}] = DistanceCost(pod.Pt, homePosition[1], pod.Type)
-			return nextPositions
-		} else if _, hasPod := state.PodAt(homePosition[0]); !hasPod {
-			// lower not free, upper free
-			nextPositions[Pod{homePosition[0], pod.Type}] = DistanceCost(pod.Pt, homePosition[0], pod.Type)
-			return nextPositions
-		} else {
-			panic("amphipod got nowhere to go! both it's homes are used up")
-		}
 	}
 
 	// it's not home, it's not in hallway, it must be in starting position!
@@ -180,12 +165,6 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 	// can't move if anyone above
 	_, podIsAbove := state.PodAt(Point{upperHomeRow, pod.Pt.Col})
 	if pod.Pt.Row == lowerHomeRow && podIsAbove {
-		return nextPositions
-
-	}
-	if _, blocked := state.PodAt(homePosition[0]); pod.Pt == homePosition[1] && blocked {
-		// it's in lower slot and someone above it
-		// this pod can't move
 		return nextPositions
 	}
 
@@ -195,7 +174,7 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 	for col := pod.Pt.Col; col >= hallStartCol; col-- {
 		currentPosition := Point{hallRow, col}
 
-		if col == AHomeCol || col == BHomeCol || col == CHomeCol || col == DHomeCol {
+		if col == homeColumn["A"] || col == homeColumn["B"] || col == homeColumn["C"] || col == homeColumn["D"] {
 			// above home, cant stop here
 			continue
 		}
@@ -211,7 +190,7 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 	for col := pod.Pt.Col; col <= hallEndCol; col++ {
 		currentPosition := Point{hallRow, col}
 
-		if col == AHomeCol || col == BHomeCol || col == CHomeCol || col == DHomeCol {
+		if col == homeColumn["A"] || col == homeColumn["B"] || col == homeColumn["C"] || col == homeColumn["D"] {
 			// above home, cant stop here
 			continue
 		}
@@ -221,7 +200,50 @@ func GetPodNextPositionsAndCosts(pod Pod, state State) map[Pod]int {
 
 		nextPositions[Pod{currentPosition, pod.Type}] = DistanceCost(pod.Pt, currentPosition, pod.Type)
 	}
+
+	// try go home
+	homePos, homeCost, canReachHome := RouteHome(pod, state)
+	if canReachHome {
+		nextPositions[homePos] = homeCost
+	}
+
 	return nextPositions
+}
+
+func RouteHome(pod Pod, state State) (Pod, int, bool) {
+	homePosition := homePositions[pod.Type]
+
+	// which direction should it go?
+	goLeft := homePosition[0].Col < pod.Pt.Col
+
+	var delta int
+	if goLeft {
+		delta = -1
+	} else {
+		delta = 1
+	}
+
+	// can it get home?
+	targetCol := homePosition[0].Col
+	for i := pod.Pt.Col; i != targetCol; i += delta {
+		// move in direction of home
+		currentPosition := Point{hallRow, i}
+		if blockingPod, blocked := state.PodAt(currentPosition); blocked && blockingPod != pod {
+			// blocked, can't get home
+			return Pod{}, 0, false
+
+		}
+	}
+
+	// it can get home! try all slots, starting from lowest
+	for i := len(homePosition) - 1; i >= 0; i-- {
+		homePos := homePosition[i]
+		if _, hasPod := state.PodAt(homePos); !hasPod {
+			return Pod{homePos, pod.Type}, DistanceCost(pod.Pt, homePos, pod.Type), true
+		}
+	}
+
+	return Pod{}, 0, false
 }
 
 func (s State) PodAt(pt Point) (Pod, bool) {
@@ -230,7 +252,7 @@ func (s State) PodAt(pt Point) (Pod, bool) {
 			return pod, true
 		}
 	}
-	return nilPod, false
+	return Pod{}, false
 }
 
 func (s State) ToMap() map[Point]string {

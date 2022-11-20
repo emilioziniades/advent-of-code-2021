@@ -2,12 +2,21 @@ package day23_test
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"testing"
 
 	"github.com/emilioziniades/adventofcode2021/day23"
+	"github.com/emilioziniades/adventofcode2021/fetch"
 	"github.com/k0kubun/pp/v3"
 )
+
+func init() {
+	err := fetch.Data("https://adventofcode.com/2021/day/23/input", "input.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func TestAbs(t *testing.T) {
 	var tests = []struct {
@@ -232,110 +241,150 @@ func TestHomeButMustMakeSpace(t *testing.T) {
 	}
 }
 
-func TestPodNextPositionsAndCostsInitialState(t *testing.T) {
-	state := day23.ParseState("example.txt")
-	tests := []struct {
-		pod      day23.Pod
-		expected map[day23.Pod]int
-	}{
-		// nowhere to go
-		{
-			day23.Pod{
-				day23.Point{3, 9},
-				"A",
-			},
-			map[day23.Pod]int{},
-		},
-		// also nowhere to go
-		{
-			day23.Pod{
-				day23.Point{3, 7},
-				"C",
-			},
-			map[day23.Pod]int{},
-		},
-		// already home, can't go anywhere
-		{
-			day23.Pod{
-				day23.Point{3, 3},
-				"A",
-			},
-			map[day23.Pod]int{},
-		},
-		// "home" but has to make space
-		{
-			day23.Pod{
-				day23.Point{2, 9},
-				"D",
-			},
-			map[day23.Pod]int{
-				{day23.Point{1, 1}, "D"}:  9000,
-				{day23.Point{1, 2}, "D"}:  8000,
-				{day23.Point{1, 4}, "D"}:  6000,
-				{day23.Point{1, 6}, "D"}:  4000,
-				{day23.Point{1, 8}, "D"}:  2000,
-				{day23.Point{1, 10}, "D"}: 2000,
-				{day23.Point{1, 11}, "D"}: 3000,
-			},
-		},
-		// can go to all hallway positions
-		{
-			day23.Pod{
-				day23.Point{2, 3},
-				"B",
-			},
-			map[day23.Pod]int{
-				{day23.Point{1, 1}, "B"}:  30,
-				{day23.Point{1, 2}, "B"}:  20,
-				{day23.Point{1, 4}, "B"}:  20,
-				{day23.Point{1, 6}, "B"}:  40,
-				{day23.Point{1, 8}, "B"}:  60,
-				{day23.Point{1, 10}, "B"}: 80,
-				{day23.Point{1, 11}, "B"}: 90,
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		got := day23.GetPodNextPositionsAndCosts(tt.pod, state)
-		if !reflect.DeepEqual(got, tt.expected) {
-			t.Errorf("All next positions not found for pod %#v", tt.pod)
-			pp.Println(got)
-			pp.Println(tt.expected)
-		}
-	}
-
-}
-
 func TestPodNextPositionsAndCosts(t *testing.T) {
-	state := day23.ParseState("example2.txt")
-	tests := []struct {
+	type testCase struct {
 		pod      day23.Pod
 		expected map[day23.Pod]int
+	}
+	tests := []struct {
+		filename string
+		cases    []testCase
 	}{
-		// only place it can go is home
 		{
-			day23.Pod{
-				day23.Point{2, 5},
-				"C",
+			"example.txt",
+			[]testCase{
+				// nowhere to go
+				{
+					day23.Pod{
+						day23.Point{3, 9},
+						"A",
+					},
+					map[day23.Pod]int{},
+				},
+				// also nowhere to go
+				{
+					day23.Pod{
+						day23.Point{3, 7},
+						"C",
+					},
+					map[day23.Pod]int{},
+				},
+				// already home, can't go anywhere
+				{
+					day23.Pod{
+						day23.Point{3, 3},
+						"A",
+					},
+					map[day23.Pod]int{},
+				},
+				// "home" but has to make space
+				{
+					day23.Pod{
+						day23.Point{2, 9},
+						"D",
+					},
+					map[day23.Pod]int{
+						{day23.Point{1, 1}, "D"}:  9000,
+						{day23.Point{1, 2}, "D"}:  8000,
+						{day23.Point{1, 4}, "D"}:  6000,
+						{day23.Point{1, 6}, "D"}:  4000,
+						{day23.Point{1, 8}, "D"}:  2000,
+						{day23.Point{1, 10}, "D"}: 2000,
+						{day23.Point{1, 11}, "D"}: 3000,
+					},
+				},
+				// can go to all hallway positions
+				{
+					day23.Pod{
+						day23.Point{2, 3},
+						"B",
+					},
+					map[day23.Pod]int{
+						{day23.Point{1, 1}, "B"}:  30,
+						{day23.Point{1, 2}, "B"}:  20,
+						{day23.Point{1, 4}, "B"}:  20,
+						{day23.Point{1, 6}, "B"}:  40,
+						{day23.Point{1, 8}, "B"}:  60,
+						{day23.Point{1, 10}, "B"}: 80,
+						{day23.Point{1, 11}, "B"}: 90,
+					},
+				},
 			},
-			map[day23.Pod]int{
-				{day23.Point{2, 7}, "C"}: 400,
+		},
+		{
+			"example2.txt",
+			[]testCase{
+				{
+					// from starting position, it can go home or into hall
+					day23.Pod{
+						day23.Point{2, 5},
+						"C",
+					},
+					map[day23.Pod]int{
+						// home
+						{day23.Point{2, 7}, "C"}: 400,
+						// all possible hallway positions
+						{day23.Point{1, 6}, "C"}:  200,
+						{day23.Point{1, 8}, "C"}:  400,
+						{day23.Point{1, 10}, "C"}: 600,
+						{day23.Point{1, 11}, "C"}: 700,
+					},
+				},
+			},
+		},
+		{
+			"example3.txt",
+			[]testCase{
+				{
+					// from hall into home
+					day23.Pod{
+						day23.Point{1, 4},
+						"B",
+					},
+					map[day23.Pod]int{
+						{day23.Point{3, 5}, "B"}: 30, // home
+					},
+				},
 			},
 		},
 	}
 
-	for _, tt := range tests {
-		got := day23.GetPodNextPositionsAndCosts(tt.pod, state)
-		if !reflect.DeepEqual(got, tt.expected) {
-			t.Errorf("All next positions not found for pod %#v", tt.pod)
-			pp.Println(got)
-			fmt.Println()
-			pp.Println(tt.expected)
+	for _, testCase := range tests {
+		state := day23.ParseState(testCase.filename)
+		for _, test := range testCase.cases {
+			got := day23.GetPodNextPositionsAndCosts(test.pod, state)
+			if !reflect.DeepEqual(got, test.expected) {
+
+				t.Errorf("All next positions not found for pod %#v", test.pod)
+				pp.Println(got)
+				fmt.Println()
+				pp.Println(test.expected)
+			}
 		}
 	}
 
 }
-func testDjikstra(t *testing.T) {
+
+func TestDjikstra(t *testing.T) {
+	tests := []struct {
+		filename string
+		want     int
+	}{
+		{
+			"example.txt",
+			12521,
+		},
+		{
+			"input.txt",
+			19059,
+		},
+	}
+
+	for _, tt := range tests {
+		got := day23.Djikstra(tt.filename)
+		if got != tt.want {
+			t.Errorf("TestDjikstra: wanted %v, got %v", tt.want, got)
+		}
+	}
 	day23.Djikstra("example.txt")
 }

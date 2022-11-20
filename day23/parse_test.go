@@ -41,3 +41,42 @@ func TestParseInitialState(t *testing.T) {
 		}
 	}
 }
+
+func TestSortState(t *testing.T) {
+	tests := []struct {
+		input    day23.State
+		expected day23.State
+	}{
+		{
+			day23.State{
+				{day23.Point{2, 3}, "B"},
+				{day23.Point{1, 4}, "C"},
+				{day23.Point{2, 7}, "B"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+			},
+			day23.State{
+				{day23.Point{1, 4}, "C"},
+				{day23.Point{2, 3}, "B"},
+				{day23.Point{2, 7}, "B"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+				{day23.Point{9, 9}, "X"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		got := tt.input
+		day23.SortState(got[:])
+		if got != tt.expected {
+			t.Errorf("TestSortState: got != expected, got: %v, expected: %v", tt.input, tt.expected)
+		}
+	}
+
+}

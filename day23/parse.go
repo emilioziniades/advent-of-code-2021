@@ -22,22 +22,14 @@ type (
 	State [8]Pod
 )
 
-// implement sort.Interface for State
-func (s State) Len() int {
-	return len(s)
-}
-
-func (s State) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-func (s State) Less(i, j int) bool {
-	return s[i].Id() < s[j].Id()
-}
-
-// unique ID for that point
-func (p Pod) Id() int {
-	return p.Pt.Row*maxRows + p.Pt.Col
+func SortState(s []Pod) {
+	sort.Slice(s, func(i, j int) bool {
+		if s[i].Pt.Row != s[j].Pt.Row {
+			return s[i].Pt.Row < s[j].Pt.Row
+		} else {
+			return s[i].Pt.Col < s[j].Pt.Col
+		}
+	})
 }
 
 func (s State) Contains(p Pod) bool {
@@ -71,7 +63,7 @@ func ParseState(file string) State {
 		}
 	}
 
-	sort.Sort(state)
+	SortState(state[:])
 
 	return state
 
