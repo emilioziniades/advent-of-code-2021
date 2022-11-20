@@ -19,7 +19,7 @@ type (
 		Row, Col int
 	}
 
-	State [8]Pod
+	State []Pod
 )
 
 func SortState(s []Pod) {
@@ -43,7 +43,7 @@ func (s State) Contains(p Pod) bool {
 
 func ParseState(file string) State {
 
-	state := State{}
+	state := make(State, 0)
 
 	data, err := parse.FileToStringSlice(file)
 
@@ -51,19 +51,16 @@ func ParseState(file string) State {
 		log.Fatalln(err)
 	}
 
-	index := 0
-
 	for r, row := range data {
 		for c, char := range row {
 			if letter := string(char); strings.Contains("ABCD", letter) {
 				current := Pod{Point{r, c}, letter}
-				state[index] = current
-				index++
+				state = append(state, current)
 			}
 		}
 	}
 
-	SortState(state[:])
+	SortState(state)
 
 	return state
 

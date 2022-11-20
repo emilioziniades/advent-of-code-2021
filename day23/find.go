@@ -7,8 +7,13 @@ import (
 	"github.com/emilioziniades/adventofcode2021/queue"
 )
 
+type StateNeighbour struct {
+	state State
+	cost  int
+}
+
 const (
-	debug = true
+	debug = false
 
 	hallRow = 1
 
@@ -41,22 +46,22 @@ func Djikstra(file string) int {
 
 	frontier := queue.NewPriority[State]()
 	frontier.Enqueue(startState, 0)
-	cameFrom := make(map[State]State)
-	costSoFar := make(map[State]int)
-	cameFrom[startState] = State{}
-	costSoFar[startState] = 0
+	cameFrom := make(map[string]string)
+	costSoFar := make(map[string]int)
+	cameFrom[startState.String()] = ""
+	costSoFar[startState.String()] = 0
 
 	for len(frontier) != 0 {
 
-		current := frontier.Dequeue().Value
+		currentState := frontier.Dequeue().Value
 		if debug {
 			fmt.Println("CURRENT: ")
 			fmt.Println()
-			PrintState(current)
+			PrintState(currentState)
 			fmt.Println()
 		}
 
-		if current == endState {
+		if currentState.String() == endState.String() {
 			if debug {
 				fmt.Println("found end state!")
 				PrintPath(startState, cameFrom)
@@ -68,53 +73,53 @@ func Djikstra(file string) int {
 			fmt.Println("NEXT: ")
 			fmt.Println()
 		}
-		for next, cost := range getStateNeighbours(current) {
+		for _, stateNeighbour := range getStateNeighbours(currentState) {
 			if debug {
-				PrintState(next)
+				PrintState(stateNeighbour.state)
 			}
-			newCost := costSoFar[current] + cost
+			newCost := costSoFar[currentState.String()] + stateNeighbour.cost
 
-			if cost, ok := costSoFar[next]; !ok || newCost < cost {
-				costSoFar[next] = newCost
-				frontier.Enqueue(next, newCost)
-				cameFrom[next] = current
+			if cost, ok := costSoFar[stateNeighbour.state.String()]; !ok || newCost < cost {
+				costSoFar[stateNeighbour.state.String()] = newCost
+				frontier.Enqueue(stateNeighbour.state, newCost)
+				cameFrom[stateNeighbour.state.String()] = currentState.String()
 			}
 		}
 	}
 
-	return costSoFar[endState]
+	return costSoFar[endState.String()]
 
 }
 
 func GetEndState(startState State) State {
-	tempEndState := make([]Pod, 0)
+	endState := make([]Pod, 0)
 	endRow := startState.LowestHomeRow()
 	startRow := hallRow + 1
 
 	for podType, col := range homeColumns {
 		for row := startRow; row <= endRow; row++ {
 			pod := Pod{Point{row, col}, podType}
-			tempEndState = append(tempEndState, pod)
+			endState = append(endState, pod)
 		}
 
 	}
-	endState := State{}
-	copy(endState[:], tempEndState)
-	SortState(endState[:])
-	return endState
+	SortState(endState)
+	return State(endState)
 }
 
-func getStateNeighbours(currentState State) map[State]int {
-	stateNeighbours := make(map[State]int)
+func getStateNeighbours(currentState State) []StateNeighbour {
+	stateNeighbours := make([]StateNeighbour, 0)
 
 	// next possible states are all the possible ways each amphipod can move
 	for i, pod := range currentState {
 		// get all possible next positions for this pod, and add those to state neighbours
 		for nextPodPosition, cost := range GetPodNextPositionsAndCosts(pod, currentState) {
-			nextState := currentState
+			nextState := make(State, len(currentState))
+			copy(nextState, currentState)
 			nextState[i] = nextPodPosition
 			SortState(nextState[:])
-			stateNeighbours[nextState] = cost
+			neighbour := StateNeighbour{nextState, cost}
+			stateNeighbours = append(stateNeighbours, neighbour)
 		}
 	}
 
@@ -303,13 +308,13 @@ func (pod Pod) HomeButMustMakeSpace(state State) bool {
 }
 
 func (s State) LowestHomeRow() int {
-	switch len(s) {
+	switch l := len(s); l {
 	case smallState:
 		return 3
 	case largeState:
 		return 5
 	default:
-		panic("unrecognized state size")
+		panic(fmt.Sprintf("unrecognized state size %v", l))
 	}
 }
 
@@ -355,8 +360,8 @@ func Abs(i int) int {
 func (state State) String() string {
 	var stateString strings.Builder
 	stateMap := state.ToMap()
-	for row := 1; row <= 3; row++ {
-		for col := 1; col <= 11; col++ {
+	for row := hallRow; row <= state.LowestHomeRow(); row++ {
+		for col := hallStartCol; col <= hallEndCol; col++ {
 			point := Point{row, col}
 			podType, ok := stateMap[point]
 			if ok {
@@ -380,20 +385,20 @@ func PrintState(state State) {
 	fmt.Println(state.String())
 }
 
-func PrintPath(startState State, cameFrom map[State]State) {
-	current := GetEndState(startState)
-	path := make([]State, 0)
-	for current != startState {
+func PrintPath(startState State, cameFrom map[string]string) {
+	current := GetEndState(startState).String()
+	path := make([]string, 0)
+	for current != startState.String() {
 		path = append(path, current)
 		current = cameFrom[current]
 	}
-	path = append(path, startState)
+	path = append(path, startState.String())
 
 	for i := len(path) - 1; i >= 0; i-- {
 		fmt.Println()
 		fmt.Println("STEP ", len(path)-i)
 		fmt.Println()
-		PrintState(path[i])
+		fmt.Println(path[i])
 		fmt.Println()
 	}
 

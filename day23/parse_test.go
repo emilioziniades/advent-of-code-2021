@@ -74,7 +74,7 @@ func TestSortState(t *testing.T) {
 	for _, tt := range tests {
 		got := tt.input
 		day23.SortState(got[:])
-		if got != tt.expected {
+		if got.String() != tt.expected.String() {
 			t.Errorf("TestSortState: got != expected, got: %v, expected: %v", tt.input, tt.expected)
 		}
 	}
