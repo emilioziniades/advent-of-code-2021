@@ -40,8 +40,11 @@ var (
 	}
 )
 
-func Djikstra(file string) int {
-	startState := ParseState(file)
+func Djikstra(file string, addMoreState bool) int {
+	startState := ParseState(file, addMoreState)
+	if debug {
+		PrintState(startState)
+	}
 	endState := GetEndState(startState)
 
 	frontier := queue.NewPriority[State]()
@@ -73,7 +76,7 @@ func Djikstra(file string) int {
 			fmt.Println("NEXT: ")
 			fmt.Println()
 		}
-		for _, stateNeighbour := range getStateNeighbours(currentState) {
+		for _, stateNeighbour := range GetStateNeighbours(currentState) {
 			if debug {
 				PrintState(stateNeighbour.state)
 			}
@@ -107,7 +110,7 @@ func GetEndState(startState State) State {
 	return State(endState)
 }
 
-func getStateNeighbours(currentState State) []StateNeighbour {
+func GetStateNeighbours(currentState State) []StateNeighbour {
 	stateNeighbours := make([]StateNeighbour, 0)
 
 	// next possible states are all the possible ways each amphipod can move
@@ -222,6 +225,14 @@ func RouteHome(pod Pod, state State) (Pod, int, bool) {
 		}
 	}
 
+	// it can get home, but are there non-home pods in its house?
+	for _, homePos := range homePosition {
+		podInHome, hasPod := state.PodAt(homePos)
+		if hasPod && podInHome.Type != pod.Type {
+			return Pod{}, 0, false
+		}
+	}
+
 	// it can get home! try all slots, starting from lowest
 	for i := len(homePosition) - 1; i >= 0; i-- {
 		homePos := homePosition[i]
@@ -264,6 +275,17 @@ func (s State) ToMap() map[Point]string {
 	return stateMap
 }
 
+func (s State) LowestHomeRow() int {
+	switch l := len(s); l {
+	case smallState:
+		return 3
+	case largeState:
+		return 5
+	default:
+		panic(fmt.Sprintf("unrecognized state size %v", l))
+	}
+}
+
 func (pod Pod) HasPodsAbove(state State) bool {
 	if pod.InHallway() {
 		return false
@@ -295,7 +317,7 @@ func (pod Pod) HomeButMustMakeSpace(state State) bool {
 			podAtPosition, hasPodAtPosition := state.PodAt(position)
 
 			if !hasPodAtPosition {
-				panic("HomeButMustMakeSpace: floating pod")
+				panic(fmt.Sprintf("HomeButMustMakeSpace: floating pod %v", pod))
 			}
 
 			if podAtPosition.Type != pod.Type {
@@ -305,17 +327,6 @@ func (pod Pod) HomeButMustMakeSpace(state State) bool {
 		}
 	}
 	return false
-}
-
-func (s State) LowestHomeRow() int {
-	switch l := len(s); l {
-	case smallState:
-		return 3
-	case largeState:
-		return 5
-	default:
-		panic(fmt.Sprintf("unrecognized state size %v", l))
-	}
 }
 
 func (p Pod) IsHome() bool {

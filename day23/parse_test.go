@@ -36,7 +36,7 @@ func TestParseInitialState(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if got := day23.ParseState(tt.filename); !reflect.DeepEqual(got, tt.expected) {
+		if got := day23.ParseState(tt.filename, false); !reflect.DeepEqual(got, tt.expected) {
 			t.Errorf("TestParseInitialState: file %v: got %v wanted %v", tt.filename, pp.Sprintln(got), pp.Sprintln(tt.expected))
 		}
 	}

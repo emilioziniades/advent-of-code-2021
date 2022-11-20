@@ -41,7 +41,7 @@ func (s State) Contains(p Pod) bool {
 	return false
 }
 
-func ParseState(file string) State {
+func ParseState(file string, withExtraState bool) State {
 
 	state := make(State, 0)
 
@@ -62,6 +62,41 @@ func ParseState(file string) State {
 
 	SortState(state)
 
+	if withExtraState {
+		return AddMoreState(state)
+	}
+
 	return state
+}
+
+func AddMoreState(state State) State {
+	newState := make(State, len(state))
+	copy(newState, state)
+
+	// pods in row 3 go to row 5
+	for i, pod := range newState {
+		if pod.Pt.Row == 3 {
+			pod.Pt.Row = 5
+			newState[i] = pod
+		}
+	}
+
+	// insert the following pods into state
+	podsToAdd := []Pod{
+		{Point{3, 3}, "D"},
+		{Point{4, 3}, "D"},
+		{Point{3, 5}, "C"},
+		{Point{4, 5}, "B"},
+		{Point{3, 7}, "B"},
+		{Point{4, 7}, "A"},
+		{Point{3, 9}, "A"},
+		{Point{4, 9}, "C"},
+	}
+
+	newState = append(newState, podsToAdd...)
+
+	SortState(newState)
+
+	return newState
 
 }

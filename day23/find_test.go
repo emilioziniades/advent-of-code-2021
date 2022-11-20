@@ -195,7 +195,7 @@ func TestIsHome(t *testing.T) {
 }
 
 func TestHomeButMustMakeSpace(t *testing.T) {
-	state := day23.ParseState("example.txt")
+	state := day23.ParseState("example.txt", false)
 	tests := []struct {
 		pod      day23.Pod
 		expected bool
@@ -350,7 +350,7 @@ func TestPodNextPositionsAndCosts(t *testing.T) {
 	}
 
 	for _, testCase := range tests {
-		state := day23.ParseState(testCase.filename)
+		state := day23.ParseState(testCase.filename, false)
 		for _, test := range testCase.cases {
 			got := day23.GetPodNextPositionsAndCosts(test.pod, state)
 			if !reflect.DeepEqual(got, test.expected) {
@@ -381,10 +381,32 @@ func TestDjikstra(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := day23.Djikstra(tt.filename)
+		got := day23.Djikstra(tt.filename, false)
 		if got != tt.want {
 			t.Errorf("TestDjikstra: wanted %v, got %v", tt.want, got)
 		}
 	}
-	day23.Djikstra("example.txt")
+}
+
+func TestBigDjikstra(t *testing.T) {
+	tests := []struct {
+		filename string
+		want     int
+	}{
+		{
+			"example.txt",
+			44169,
+		},
+		{
+			"input.txt",
+			48541,
+		},
+	}
+
+	for _, tt := range tests {
+		got := day23.Djikstra(tt.filename, true)
+		if got != tt.want {
+			t.Errorf("TestBigDjikstra: wanted %v, got %v", tt.want, got)
+		}
+	}
 }
