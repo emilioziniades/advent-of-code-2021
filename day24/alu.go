@@ -9,7 +9,9 @@ import (
 	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
-const debug = true
+const debug = false
+
+// const debug = true
 
 func Run(program []string, inputs []int, outVar string) int {
 	vars := map[string]int{
@@ -57,6 +59,9 @@ func Run(program []string, inputs []int, outVar string) int {
 			s1 := step[1]
 			s2 := step[2]
 			if v2, ok := vars[s2]; ok {
+				if v2 == 0 {
+					panic("div 0")
+				}
 				vars[s1] /= v2
 			} else {
 				v2, _ := strconv.Atoi(s2)
@@ -117,7 +122,9 @@ func LoadProgram(filename string) []string {
 
 func ValidateModelNumber(filename string) int {
 	program := LoadProgram(filename)
-	for i := 99999999999999; i >= 11111111111111; i-- {
+	// for i := 99999999999999; i >= 11111111111111; i-- {
+	// for i := 19999999999999; i <= 99999999999999; i += 10000000000000 {
+	for i := 11111111111111; i <= 99999999999999; i++ {
 		digit, skip := digits(i)
 		if skip {
 			continue
@@ -127,6 +134,7 @@ func ValidateModelNumber(filename string) int {
 		if n == 0 {
 			return i
 		}
+		// break
 	}
 	return -1
 }
