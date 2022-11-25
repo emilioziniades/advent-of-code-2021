@@ -18,7 +18,7 @@ func TestPrograms(t *testing.T) {
 
 	type testcase struct {
 		outvar string
-		inputs []int
+		input  int
 		want   int
 	}
 
@@ -31,13 +31,13 @@ func TestPrograms(t *testing.T) {
 			[]testcase{
 				{
 					"x",
-					[]int{1},
+					1,
 					-1,
 				},
 				{
 					"x",
-					[]int{42},
-					-42,
+					9,
+					-9,
 				},
 			},
 		},
@@ -46,12 +46,12 @@ func TestPrograms(t *testing.T) {
 			[]testcase{
 				{
 					"z",
-					[]int{3, 9},
+					39,
 					1,
 				},
 				{
 					"z",
-					[]int{3, 6},
+					36,
 					0,
 				},
 			},
@@ -61,43 +61,43 @@ func TestPrograms(t *testing.T) {
 			[]testcase{
 				{
 					"w",
-					[]int{15},
-					1,
+					7,
+					0,
 				},
 				{
 					"x",
-					[]int{15},
+					7,
 					1,
 				},
 				{
 					"y",
-					[]int{15},
+					7,
 					1,
 				},
 				{
 					"z",
-					[]int{15},
+					7,
 					1,
 				},
 				{
 					"w",
-					[]int{42},
+					9,
 					1,
 				},
 				{
 					"x",
-					[]int{42},
+					9,
 					0,
 				},
 				{
 					"y",
-					[]int{42},
-					1,
+					9,
+					0,
 				},
 				{
 					"z",
-					[]int{42},
-					0,
+					9,
+					1,
 				},
 			},
 		},
@@ -106,14 +106,14 @@ func TestPrograms(t *testing.T) {
 	for _, tt := range tests {
 		program := day24.LoadProgram(tt.filename)
 		for _, testcase := range tt.testcases {
-			got := day24.Run(program, testcase.inputs, testcase.outvar)
+			got := day24.Run(program, testcase.input, testcase.outvar)
 			if got != testcase.want {
 				t.Errorf(
 					"TestPrograms: got %v wanted %v for program: \n %#v \n inputs: %v",
 					got,
 					testcase.want,
 					program,
-					testcase.inputs,
+					testcase.input,
 				)
 			}
 
@@ -121,7 +121,7 @@ func TestPrograms(t *testing.T) {
 	}
 }
 
-func TestValidateModelNumber(t *testing.T) {
+func testValidateModelNumber(t *testing.T) {
 	tests := []struct {
 		filename string
 		want     int

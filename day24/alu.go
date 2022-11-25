@@ -9,11 +9,19 @@ import (
 	"github.com/emilioziniades/adventofcode2021/parse"
 )
 
-const debug = false
+const (
+	debug    = false
+	MinInput = 11111111111111
+	MaxInput = 99999999999999
+)
 
 // const debug = true
 
-func Run(program []string, inputs []int, outVar string) int {
+func Run(program []string, input int, outVar string) int {
+	inputs, skip := GetDigits(input)
+	if skip {
+		return -1
+	}
 	vars := map[string]int{
 		"w": 0,
 		"x": 0,
@@ -30,10 +38,10 @@ func Run(program []string, inputs []int, outVar string) int {
 		op := step[0]
 		switch op {
 		case "inp":
-			input := inputs[0]
+			i := inputs[0]
 			inputs = inputs[1:]
 			s1 := step[1]
-			vars[s1] = input
+			vars[s1] = i
 
 		case "add":
 			s1 := step[1]
@@ -122,14 +130,10 @@ func LoadProgram(filename string) []string {
 
 func ValidateModelNumber(filename string) int {
 	program := LoadProgram(filename)
-	// for i := 99999999999999; i >= 11111111111111; i-- {
-	// for i := 19999999999999; i <= 99999999999999; i += 10000000000000 {
-	for i := 11111111111111; i <= 99999999999999; i++ {
-		digit, skip := digits(i)
-		if skip {
-			continue
-		}
-		n := Run(program, digit, "z")
+	for i := 99999999999999; i >= 11111111111111; i-- {
+		// for i := 19999999999999; i <= 99999999999999; i += 10000000000000 {
+		// for i := 11111111111111; i <= 99999999999999; i++ {
+		n := Run(program, i, "z")
 		fmt.Println(i, "\t", n)
 		if n == 0 {
 			return i
@@ -139,7 +143,7 @@ func ValidateModelNumber(filename string) int {
 	return -1
 }
 
-func digits(n int) ([]int, bool) {
+func GetDigits(n int) ([]int, bool) {
 	s := strconv.Itoa(n)
 	strSlice := strings.Split(s, "")
 	intSlice := make([]int, 0)
