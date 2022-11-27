@@ -120,22 +120,3 @@ func TestPrograms(t *testing.T) {
 		}
 	}
 }
-
-func testValidateModelNumber(t *testing.T) {
-	tests := []struct {
-		filename string
-		want     int
-	}{
-		{
-			"input.txt",
-			0,
-		},
-	}
-
-	for _, tt := range tests {
-		if got := day24.ValidateModelNumber(tt.filename); got != tt.want {
-			t.Errorf("TestValidateModelNumber: got %v, wanted %v for %v", got, tt.want, tt.filename)
-		}
-	}
-
-}

@@ -1,11 +1,9 @@
 package day24_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/emilioziniades/adventofcode2021/day24"
-	"github.com/k0kubun/pp/v3"
 )
 
 var changingValues = [14][3]int{
@@ -37,19 +35,33 @@ func TestGetChangingValues(t *testing.T) {
 	}
 }
 
-func TestGetRestrictedPairs(t *testing.T) {
+func TestFindAllValidModelNumbers(t *testing.T) {
 	changingValues := day24.GetChangingValues("input.txt")
-	pairs := day24.GetRestrictedPairs(changingValues)
-	for _, pair := range pairs {
-		fmt.Printf("restriction: i%d + %d = i%d\n", pair.Miss.Index, pair.Miss.Values.B+pair.Hit.Values.A, pair.Hit.Index)
+	validModelNumbers := day24.FindAllValidModelNumbers("input.txt")
+	want := 0
+	for _, modelNumber := range validModelNumbers {
+		got := day24.StepAll(modelNumber, changingValues)
+		if got != want {
+			t.Errorf("TestFindAllValidModelNumbers: got %v, wanted %v, for model number %v", got, want, modelNumber)
+		}
 	}
-
 }
 
-func TestFindAllModelNumbers(t *testing.T) {
-	changingValues := day24.GetChangingValues("input.txt")
-	pairs := day24.GetRestrictedPairs(changingValues)
-	validModelNumbers := day24.FindAllModelNumbers(pairs)
-	pp.Println(validModelNumbers)
+func TestFindMaxModelNumber(t *testing.T) {
+	name := "input.txt"
+	got := day24.FindMaxValidModelNumber(name)
+	want := 93997999296912
+	if got != want {
+		t.Errorf("TestFindMaxModelNumber: got %d, wanted %d, for %s", got, want, name)
+	}
+}
+
+func TestFindMinModelNumber(t *testing.T) {
+	name := "input.txt"
+	got := day24.FindMinValidModelNumber(name)
+	want := 81111379141811
+	if got != want {
+		t.Errorf("TestFindMinModelNumber: got %d, wanted %d, for %s", got, want, name)
+	}
 
 }

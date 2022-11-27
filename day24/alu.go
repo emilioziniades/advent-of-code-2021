@@ -15,8 +15,6 @@ const (
 	MaxInput = 99999999999999
 )
 
-// const debug = true
-
 func Run(program []string, input int, outVar string) int {
 	inputs, skip := GetDigits(input)
 	if skip {
@@ -122,25 +120,8 @@ func LoadProgram(filename string) []string {
 		log.Fatalf("LoadProgram: %v", err)
 	}
 
-	// TODO : parse string into more useful structure
-
 	return rawProgram
 
-}
-
-func ValidateModelNumber(filename string) int {
-	program := LoadProgram(filename)
-	for i := 99999999999999; i >= 11111111111111; i-- {
-		// for i := 19999999999999; i <= 99999999999999; i += 10000000000000 {
-		// for i := 11111111111111; i <= 99999999999999; i++ {
-		n := Run(program, i, "z")
-		fmt.Println(i, "\t", n)
-		if n == 0 {
-			return i
-		}
-		// break
-	}
-	return -1
 }
 
 func GetDigits(n int) ([]int, bool) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"os"
 
 	"github.com/emilioziniades/adventofcode2021/stack"
@@ -22,7 +23,37 @@ type Pair struct {
 	Hit, Miss Single
 }
 
-func FindAllModelNumbers(pairs []Pair) [][]int {
+func FindMaxValidModelNumber(name string) int {
+	modelNumbers := FindAllValidModelNumbers(name)
+	n := 0
+	for _, e := range modelNumbers {
+		if e > n {
+			n = e
+		}
+	}
+	return n
+}
+
+func FindMinValidModelNumber(name string) int {
+	modelNumbers := FindAllValidModelNumbers(name)
+	n := math.MaxInt
+	for _, e := range modelNumbers {
+		if e < n {
+			n = e
+		}
+	}
+	return n
+}
+
+func FindAllValidModelNumbers(name string) []int {
+	changingValues := GetChangingValues(name)
+	pairs := GetRestrictedPairs(changingValues)
+	validModelNumbers := findAllValidModelNumbers(pairs)
+	return validModelNumbers
+
+}
+
+func findAllValidModelNumbers(pairs []Pair) []int {
 	modelNumberLength := len(pairs) * 2
 	modelNumbers := make([][]int, 0)
 	zeros := make([]int, modelNumberLength)
@@ -30,25 +61,48 @@ func FindAllModelNumbers(pairs []Pair) [][]int {
 
 	for _, pair := range pairs {
 		newModelNumbers := make([][]int, 0)
-		copy(newModelNumbers, modelNumbers)
+
 		for _, modelNumber := range modelNumbers {
-			for i := 1; i <= 9; i++ {
-				j := i + pair.Miss.Values.B + pair.Hit.Values.A
-				newModelNumber := make([]int, modelNumberLength)
-				copy(newModelNumber, modelNumber)
-				if j >= 1 && j <= 9 {
-					// this is a valid pair, insert it
-					newModelNumber[pair.Miss.Index] = i
-					newModelNumber[pair.Hit.Index] = j
+			for missDigit := 1; missDigit <= 9; missDigit++ {
+				hitDigit := missDigit + pair.Miss.Values.B + pair.Hit.Values.A
+
+				if hitDigit >= 1 && hitDigit <= 9 {
+					// this is a valid pair, insert values at those indexes
+					newModelNumber := make([]int, modelNumberLength)
+					copy(newModelNumber, modelNumber)
+					newModelNumber[pair.Miss.Index] = missDigit
+					newModelNumber[pair.Hit.Index] = hitDigit
 					newModelNumbers = append(newModelNumbers, newModelNumber)
 				}
 			}
 		}
-		copy(modelNumbers, newModelNumbers)
+		oldLen := len(modelNumbers)
+		modelNumbers = append(modelNumbers, newModelNumbers...)
+		modelNumbers = modelNumbers[oldLen:]
 	}
 
-	return modelNumbers
+	modelNumberInts := make([]int, 0)
+	for _, s := range modelNumbers {
+		modelNumberInts = append(modelNumberInts, IntSliceToInt(s))
+	}
 
+	return modelNumberInts
+}
+
+func IntSliceToInt(s []int) int {
+	n := 0
+	pow := 1
+
+	for i := len(s) - 1; i >= 0; i-- {
+		x := s[i]
+		if x > 9 {
+			panic("this only works for single digit slice values")
+		}
+		n += x * pow
+		pow *= 10
+	}
+
+	return n
 }
 
 func GetRestrictedPairs(changingValues []Values) []Pair {
