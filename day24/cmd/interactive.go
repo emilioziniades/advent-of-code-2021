@@ -12,14 +12,14 @@ func main() {
 }
 
 func stepInteractive() {
+	changingValues := day24.GetChangingValues("input.txt")
 	var z int
 	for n := 0; n < 14; n++ {
-		vals := day24.ChangingValues[n]
-		a, b, c := vals[0], vals[1], vals[2]
+		vals := changingValues[n]
 		fmt.Printf("z%d: %d\n", n, z)
-		printOptions(z, a, b, c)
+		printOptions(z, vals.A, vals.B, vals.C)
 		i := scanDigit(fmt.Sprintf("i%d: ", n))
-		z = day24.Step(z, i, a, b, c)
+		z = day24.Step(z, i, vals.A, vals.B, vals.C)
 	}
 	fmt.Printf("z: %d\n", z)
 }

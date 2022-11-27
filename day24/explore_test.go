@@ -9,9 +9,11 @@ import (
 )
 
 func TestRemakeInstructions(t *testing.T) {
-	got := day24.RemakeInstructions()
+	filename := "input.txt"
+	changingValues := day24.GetChangingValues(filename)
+	got := day24.RemakeInstructions(changingValues)
 
-	wantByte, _ := os.ReadFile("input.txt")
+	wantByte, _ := os.ReadFile(filename)
 	want := string(wantByte)
 
 	if got != want {
@@ -22,11 +24,13 @@ func TestRemakeInstructions(t *testing.T) {
 
 // ensures that our step function stays in line with raw program
 func TestStepAll(t *testing.T) {
-	program := day24.LoadProgram("input.txt")
+	filename := "input.txt"
+	program := day24.LoadProgram(filename)
+	changingValues := day24.GetChangingValues(filename)
 	for n := day24.MaxInput; n >= day24.MinInput; n -= 123325798721 {
 
 		want := day24.Run(program, n, "z")
-		got := day24.StepAll(n)
+		got := day24.StepAll(n, changingValues)
 		if got != want {
 			t.Errorf("TestStepAll: got %v, want %v for %v", got, want, n)
 		}
